@@ -1,148 +1,251 @@
-# MMSSL: Multi-Modal Self-Supervised Learning for Recommendation
+hadoop-ai-search@psx3eevxria5um28-worker-0:/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05$ bash TTCS-base/TTCS/src/script/run_with_gpus.sh 8
+==============================================
+  Self-evolving-Agent GPU Launcher
+==============================================
+Time: 2026-03-01 21:06:14
 
-PyTorch implementation for WWW 2023 paper [Multi-Modal Self-Supervised Learning for Recommendation](https://arxiv.org/pdf/2302.10632.pdf).
+[INFO] 21:06:21 - Requested GPU count: 8
 
-<p align="center">
-<img src="./MMSSL.png" alt="MMSSL" />
-</p>
+Current GPU Status:
+----------------------------------------
+GPU   Mem Used     Mem Total    Util       Status  
+----------------------------------------
+0     5MB          81920MB      0%         Idle    
+1     5MB          81920MB      0%         Idle    
+2     5MB          81920MB      0%         Idle    
+3     5MB          81920MB      0%         Idle    
+4     2MB          81920MB      0%         Idle    
+5     2MB          81920MB      0%         Idle    
+6     2MB          81920MB      0%         Idle    
+7     2MB          81920MB      0%         Idle    
+----------------------------------------
+Idle threshold: Memory < 4000MB, Utilization < 5%
 
-MMSSL is a new multimedia recommender system which integrates the generative modality-aware collaborative self-augmentation and the contrastive cross-modality dependency encoding. It achieves better performance than existing SOTA multi-model recommenders.
+[INFO] 21:06:41 - Waiting for 8 idle GPUs...
+[INFO] 21:06:47 - Check interval: 1800s, Max wait: 48h
 
+[INFO] 21:07:20 - Current idle GPUs: 8 / Needed: 8
+[INFO] 21:07:26 - GPU resources meet requirements!
+[INFO] 21:08:13 - Selected GPUs: 0 1 2 3 4 5 6 7
 
-<h2>Dependencies </h2>
+GPU Allocation Config:
+==============================================
+Total GPUs:        8
+Selected GPU IDs:  0,1,2,3,4,5,6,7
 
-* Python >= 3.9.13
-* [Pytorch](https://pytorch.org/) >= 1.13.0+cu116
-* [dgl-cuda11.6](https://www.dgl.ai/) >= 0.9.1post1
+Challenger GPUs:   0,1,2,3 (total 4)
+Reward GPUs:       4,5,6,7 (total 4)
+Solver GPUs:       0,1,2,3,4,5,6,7 (total 8)
+Gen Query GPUs:    0,1,2,3,4,5,6,7
 
+Reward Ports:      5000,5001,5002,5003
+Reward Base Port:  5000
+==============================================
 
+Path Config:
+==============================================
+Base Dir:          /mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base
+Project Name:      TTCS
+Code Module:       src
+Working Dir:       /mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/TTCS
+Model Dir:         /mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05
+Data Dir:          /mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/TTCS/data
+Results Dir:       /mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/saved_results
+Prompt Dir:        /mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/TTCS/src
+==============================================
 
+[INFO] 21:08:20 - Starting training...
 
-<h2>Usage </h2>
+==============================================
+  Starting main.sh
+==============================================
 
-Start training and inference as:
++ export VLLM_WORKER_MULTIPROC_METHOD=spawn
++ VLLM_WORKER_MULTIPROC_METHOD=spawn
++ export PYTHONPATH=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/TTCS:/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/TTCS:/workdir:
++ PYTHONPATH=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/TTCS:/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/TTCS:/workdir:
++++ dirname /mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/TTCS/src/script/main.sh
+++ cd /mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/TTCS/src/script
+++ pwd
++ SCRIPT_DIR=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/TTCS/src/script
++ base_model_name=Qwen2.5-Math-1.5B
++ base_model_path=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/Qwen2.5-Math-1.5B
++ question_reward=TTCS
++ dataset=Minerva
++ real_data_ratio=5.0
++ temperature=0.6
++ dataset_batch_size_map=(['AIME24']='16' ['AIME25']='16' ['AMC23']='16' ['MATH500']='64' ['Minerva']='64' ['OlympiadBench']='64')
++ declare -A dataset_batch_size_map
++ dataset_rollout_n_map=(['AIME24']='16' ['AIME25']='16' ['AMC23']='16' ['MATH500']='8' ['Minerva']='8' ['OlympiadBench']='8')
++ declare -A dataset_rollout_n_map
++ train_file=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/TTCS/data/ttrl/Minerva.parquet
++ solver_batch_size=64
++ rollout_n=8
++ echo '[Config] dataset: Minerva, solver_batch_size: 64, rollout_n: 8, train_file: /mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/TTCS/data/ttrl/Minerva.parquet'
+[Config] dataset: Minerva, solver_batch_size: 64, rollout_n: 8, train_file: /mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/TTCS/data/ttrl/Minerva.parquet
++ group_question_repetion_penalty=True
++ gen_question_func=ttrl_icl
++ hybrid_data=True
++ '[' 8 -eq 4 ']'
++ challenger_training_steps=5
++ solver_training_steps=15
++ variant=data_Minerva_TTCS_gqttrl_icl_Qwen2.5-Math-1.5B
++ exp_name=data_Minerva_TTCS_gqttrl_icl_Qwen2.5-Math-1.5B-V1
++ solver_retrain_steps=15
++ solver_eval_step=15
++ solver_eval_temperature=0.6
++ solver_eval_num_iter=15
++ mkdir -p /mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/saved_results /mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/saved_results/Synthesizer_ttrl /mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/saved_results/Solver_ttrl /mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/saved_results/tensorboard_log /mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/TTCS/logs
++ exec
++++ now
++++ date +%Y-%m-%d-%H-%M
+++ tee -a /mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/TTCS/logs/train_data_Minerva_TTCS_gqttrl_icl_Qwen2.5-Math-1.5B-2026-03-01-21-08.log
++ cd /mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/TTCS
++ echo 'Starting round 1 training...'
+Starting round 1 training...
++ echo 'Training Challenger...'
+Training Challenger...
++ bash /mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/TTCS/src/script/challenger.sh data_Minerva_TTCS_gqttrl_icl_Qwen2.5-Math-1.5B-V1 /mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/Qwen2.5-Math-1.5B /mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/Qwen2.5-Math-1.5B 5 TTCS True ttrl_icl /mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/TTCS/data/ttrl/Minerva.parquet
+Force cleaning up vLLM processes and ports before starting...
+  Force cleaning up all vLLM related processes...
+    vLLM process status before cleanup:
+      No vLLM processes found
+    No vLLM processes to clean up
+    Cleaning up vLLM multiprocess child processes...
+    No vLLM child processes to clean up
+    vLLM process status after cleanup:
+      No vLLM processes found
+      No vLLM child processes found
+    Port usage status after cleanup:
+      Port 5000 is free
+      Port 5001 is free
+      Port 5002 is free
+      Port 5003 is free
+  vLLM process force cleanup completed
+[exp_name]:data_Minerva_TTCS_gqttrl_icl_Qwen2.5-Math-1.5B-V1
+[challenger_model_path]: /mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/Qwen2.5-Math-1.5B
+[solver_model_path]: /mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/Qwen2.5-Math-1.5B
+[challenger_training_steps]: 5
+[Path Config] Working Dir: /mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/TTCS
+[Path Config] Prompt Dir: /mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/TTCS/src
+[Path Config] Storage Path: /mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/saved_results/Synthesizer_ttrl/data_Minerva_TTCS_gqttrl_icl_Qwen2.5-Math-1.5B-V1
+[GPU Config] Challenger GPUs: 0,1,2,3 (total 4)
+[GPU Config] Reward GPUs: 4,5,6,7
+[GPU Config] Reward Ports: 5000,5001,5002,5003
+[Reward Server] GPU Config: 4,5,6,7
+[Reward Server] Port Config: 5000,5001,5002,5003
+Starting vLLM reward server...
+Launching Reward Server: GPU=4, Port=5000
+Launching Reward Server: GPU=5, Port=5001
+Launching Reward Server: GPU=6, Port=5002
+Launching Reward Server: GPU=7, Port=5003
+Waiting for vLLM service to start...
+Starting main training process...
+Using GPU: 0,1,2,3, total 4
+/usr/local/lib/python3.12/dist-packages/torch/cuda/__init__.py:63: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/usr/local/lib/python3.12/dist-packages/torch/cuda/__init__.py:63: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/usr/local/lib/python3.12/dist-packages/torch/cuda/__init__.py:63: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/usr/local/lib/python3.12/dist-packages/torch/cuda/__init__.py:63: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+/usr/local/lib/python3.12/dist-packages/torch/cuda/__init__.py:63: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+W0301 21:19:44.692000 14322 torch/utils/cpp_extension.py:2425] TORCH_CUDA_ARCH_LIST is not set, all archs for visible cards are included for compilation. 
+W0301 21:19:44.692000 14322 torch/utils/cpp_extension.py:2425] If this is not desired, please set os.environ['TORCH_CUDA_ARCH_LIST'] to specific architectures.
+WARNING:2026-03-01 21:19:44,700:fused_indices_to_multihot has reached end of life. Please migrate to a non-experimental function.
+WARNING:2026-03-01 21:19:44,741:fused_indices_to_multihot has reached end of life. Please migrate to a non-experimental function.
+WARNING:2026-03-01 21:19:44,755:fused_indices_to_multihot has reached end of life. Please migrate to a non-experimental function.
+WARNING:2026-03-01 21:19:44,759:fused_indices_to_multihot has reached end of life. Please migrate to a non-experimental function.
+WARNING:2026-03-01 21:19:44,784:fused_indices_to_multihot has reached end of life. Please migrate to a non-experimental function.
+W0301 21:19:47.835000 14322 torch/utils/cpp_extension.py:2425] TORCH_CUDA_ARCH_LIST is not set, all archs for visible cards are included for compilation. 
+W0301 21:19:47.835000 14322 torch/utils/cpp_extension.py:2425] If this is not desired, please set os.environ['TORCH_CUDA_ARCH_LIST'] to specific architectures.
+W0301 21:19:50.082000 14323 torch/utils/cpp_extension.py:2425] TORCH_CUDA_ARCH_LIST is not set, all archs for visible cards are included for compilation. 
+W0301 21:19:50.082000 14323 torch/utils/cpp_extension.py:2425] If this is not desired, please set os.environ['TORCH_CUDA_ARCH_LIST'] to specific architectures.
+W0301 21:19:52.437000 14339 torch/utils/cpp_extension.py:2425] TORCH_CUDA_ARCH_LIST is not set, all archs for visible cards are included for compilation. 
+W0301 21:19:52.437000 14339 torch/utils/cpp_extension.py:2425] If this is not desired, please set os.environ['TORCH_CUDA_ARCH_LIST'] to specific architectures.
+W0301 21:19:54.872000 14324 torch/utils/cpp_extension.py:2425] TORCH_CUDA_ARCH_LIST is not set, all archs for visible cards are included for compilation. 
+W0301 21:19:54.872000 14324 torch/utils/cpp_extension.py:2425] If this is not desired, please set os.environ['TORCH_CUDA_ARCH_LIST'] to specific architectures.
+W0301 21:19:55.579000 14321 torch/utils/cpp_extension.py:2425] TORCH_CUDA_ARCH_LIST is not set, all archs for visible cards are included for compilation. 
+W0301 21:19:55.579000 14321 torch/utils/cpp_extension.py:2425] If this is not desired, please set os.environ['TORCH_CUDA_ARCH_LIST'] to specific architectures.
+[idle_worker] GPU idle worker started.
+[main] GPU idle worker thread started.
+[init] Loading model...
+[init] Pausing GPU idle worker for model initialization...
+[idle_worker] Paused.
+INFO 03-01 21:20:51 [__init__.py:216] Automatically detected platform cuda.
+[idle_worker] GPU idle worker started.
+[main] GPU idle worker thread started.
+[init] Loading model...
+[init] Pausing GPU idle worker for model initialization...
+[idle_worker] Paused.
+INFO 03-01 21:20:51 [__init__.py:216] Automatically detected platform cuda.
+[idle_worker] GPU idle worker started.
+[main] GPU idle worker thread started.
+[init] Loading model...
+[init] Pausing GPU idle worker for model initialization...
+[idle_worker] Paused.
+INFO 03-01 21:20:51 [__init__.py:216] Automatically detected platform cuda.
+[idle_worker] GPU idle worker started.
+[main] GPU idle worker thread started.
+[init] Loading model...
+[init] Pausing GPU idle worker for model initialization...
+[idle_worker] Paused.
+INFO 03-01 21:20:51 [__init__.py:216] Automatically detected platform cuda.
+[2026-03-01 21:21:20,450 W 14339 14339] rpc_client.h:153: Failed to connect to GCS at address 10.148.45.68:54119 within 5 seconds.
+[2026-03-01 21:21:50,451 W 14339 14339] gcs_client.cc:205: Failed to get cluster ID from GCS server: TimedOut: Timed out while waiting for GCS to become available.
+INFO 03-01 21:22:16 [utils.py:233] non-default args: {'tokenizer': '/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/Qwen2.5-Math-1.5B', 'gpu_memory_utilization': 0.95, 'disable_log_stats': True, 'model': '/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/Qwen2.5-Math-1.5B'}
+INFO 03-01 21:22:18 [utils.py:233] non-default args: {'tokenizer': '/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/Qwen2.5-Math-1.5B', 'gpu_memory_utilization': 0.95, 'disable_log_stats': True, 'model': '/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/Qwen2.5-Math-1.5B'}
+INFO 03-01 21:22:18 [utils.py:233] non-default args: {'tokenizer': '/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/Qwen2.5-Math-1.5B', 'gpu_memory_utilization': 0.95, 'disable_log_stats': True, 'model': '/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/Qwen2.5-Math-1.5B'}
+INFO 03-01 21:22:26 [utils.py:233] non-default args: {'tokenizer': '/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/Qwen2.5-Math-1.5B', 'gpu_memory_utilization': 0.95, 'disable_log_stats': True, 'model': '/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/Qwen2.5-Math-1.5B'}
+2026-03-01 21:22:53,029 ERROR services.py:1342 -- Failed to start the dashboard 
+2026-03-01 21:22:53,029 ERROR services.py:1367 -- Error should be written to 'dashboard.log' or 'dashboard.err'. We are printing the last 20 lines for you. See 'https://docs.ray.io/en/master/ray-observability/user-guides/configure-logging.html#logging-directory-structure' to find where the log file is.
+2026-03-01 21:22:53,030 ERROR services.py:1377 -- Couldn't read dashboard.log file. Error: [Errno 2] No such file or directory: '/tmp/ray/session_2026-03-01_21-21-15_411438_14339/logs/dashboard.log'. It means the dashboard is broken even before it initializes the logger (mostly dependency issues). Reading the dashboard.err file which contains stdout/stderr.
+2026-03-01 21:22:53,030 ERROR services.py:1411 -- Failed to read dashboard.err file: [Errno 2] No such file or directory: '/tmp/ray/session_2026-03-01_21-21-15_411438_14339/logs/dashboard.err'. It is unexpected. Please report an issue to Ray github. https://github.com/ray-project/ray/issues
+2026-03-01 21:22:53,038 WARNING services.py:2137 -- WARNING: The object store is using /tmp instead of /dev/shm because /dev/shm has only 1073618944 bytes available. This will harm performance! You may be able to free up space by deleting files in /dev/shm. If you are inside a Docker container, you can increase /dev/shm size by passing '--shm-size=10.24gb' to 'docker run' (or add it to the run_options list in a Ray cluster config). Make sure to set this to more than 30% of available RAM.
+2026-03-01 21:23:23,193 INFO node.py:362 -- Failed to get node info b'RPC error: Deadline Exceeded'
+ray init kwargs: {'num_cpus': None, 'runtime_env': {'env_vars': {'TOKENIZERS_PARALLELISM': 'true', 'NCCL_DEBUG': 'WARN', 'VLLM_LOGGING_LEVEL': 'WARN', 'VLLM_ALLOW_RUNTIME_LORA_UPDATING': 'true', 'CUDA_DEVICE_MAX_CONNECTIONS': '1', 'NCCL_CUMEM_ENABLE': '0'}, 'working_dir': None}}
+Error executing job with overrides: ['algorithm.adv_estimator=grpo', 'data.train_batch_size=32', 'data.max_prompt_length=3072', 'data.max_response_length=1024', 'data.num_querys=160', '+data.get_prompts_func=ttrl_icl', '+data.gen_question_func=ttrl_icl', '+data.prompt_path=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/TTCS/src', 'data.filter_overlong_prompts=True', 'data.dynamic_topics=False', 'data.truncation=error', '+data.ttrl_icl_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/TTCS/data/ttrl/Minerva.parquet', 'actor_rollout_ref.model.path=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/Qwen2.5-Math-1.5B', 'actor_rollout_ref.actor.optim.lr=1e-6', "actor_rollout_ref.actor.checkpoint.save_contents=['hf_model']", 'actor_rollout_ref.model.use_remove_padding=True', 'actor_rollout_ref.actor.ppo_mini_batch_size=8', 'actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=2', 'actor_rollout_ref.actor.use_kl_loss=True', 'actor_rollout_ref.actor.kl_loss_coef=0.01', 'actor_rollout_ref.actor.kl_loss_type=low_var_kl', 'actor_rollout_ref.actor.entropy_coeff=0', 'actor_rollout_ref.model.enable_gradient_checkpointing=True', 'actor_rollout_ref.actor.fsdp_config.param_offload=False', 'actor_rollout_ref.actor.fsdp_config.optimizer_offload=False', 'actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=2', 'actor_rollout_ref.rollout.tensor_model_parallel_size=1', 'actor_rollout_ref.rollout.name=vllm', 'actor_rollout_ref.rollout.temperature=1.0', 'actor_rollout_ref.rollout.top_p=0.99', 'actor_rollout_ref.rollout.top_k=-1', 'actor_rollout_ref.rollout.gpu_memory_utilization=0.60', 'actor_rollout_ref.rollout.n=4', 'actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=2', 'actor_rollout_ref.ref.fsdp_config.param_offload=True', 'algorithm.use_kl_in_reward=False', 'reward_model.reward_manager=challenger', 'reward_model.reward_kwargs.storage_path=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/saved_results/Synthesizer_ttrl/data_Minerva_TTCS_gqttrl_icl_Qwen2.5-Math-1.5B-V1', '+reward_model.reward_kwargs.question_reward=TTCS', '+reward_model.reward_kwargs.group_question_repetion_penalty=True', '+reward_model.reward_kwargs.gen_question_func=ttrl_icl', 'trainer.critic_warmup=0', 'trainer.logger=["console","tensorboard"]', 'trainer.project_name=TTCS', 'trainer.experiment_name=Challenger-data_Minerva_TTCS_gqttrl_icl_Qwen2.5-Math-1.5B-V1', 'trainer.n_gpus_per_node=4', 'trainer.total_training_steps=5', 'trainer.nnodes=1', 'trainer.val_before_train=False', 'trainer.default_local_dir=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/saved_results/Synthesizer_ttrl/data_Minerva_TTCS_gqttrl_icl_Qwen2.5-Math-1.5B-V1/ckpts/', 'trainer.save_freq=5', 'trainer.test_freq=-1', 'trainer.total_epochs=15']
+Traceback (most recent call last):
+  File "/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/TTCS/src/main_challenger.py", line 44, in main
+    run_ppo(config)
+  File "/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/TTCS/src/main_challenger.py", line 68, in run_ppo
+    ray.init(**OmegaConf.to_container(ray_init_kwargs))
+  File "/usr/local/lib/python3.12/dist-packages/ray/_private/client_mode_hook.py", line 104, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/ray/_private/worker.py", line 1902, in init
+    _global_node = ray._private.node.Node(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/ray/_private/node.py", line 364, in __init__
+    raise Exception(
+Exception: The current node timed out during startup. This could happen because some of the raylet failed to startup or the GCS has become overloaded.
 
-```
-cd MMSSL
-python ./main.py --dataset {DATASET}
-```
-Supported datasets:  `Amazon-Baby`, `Amazon-Sports`, `Tiktok`, `Allrecipes`
-
-
-<h2> Datasets </h2>
-
-  ```
-  ├─ MMSSL/ 
-      ├── data/
-        ├── tiktok/
-        ...
-  ```
-  |    Dataset   |   |  Amazon  |      |   |          |      |   |  Tiktok  |     |     |   | Allrecipes |    |
-|:------------:|:-:|:--------:|:----:|:-:|:--------:|:----:|:-:|:--------:|:---:|:---:|:-:|:----------:|:--:|
-|   Modality   |   |     V    |   T  |   |     V    |   T  |   |     V    |  A  |  T  |   |      V     |  T |
-|   Embed Dim  |   |   4096   | 1024 |   |   4096   | 1024 |   |    128   | 128 | 768 |   |    2048    | 20 |
-|     User     |   |   35598  |      |   |   19445  |      |   |   9319   |     |     |   |    19805   |    |
-|     Item     |   |   18357  |      |   |   7050   |      |   |   6710   |     |     |   |    10067   |    |
-| Interactions |   |  256308  |      |   |  139110  |      |   |   59541  |     |     |   |    58922   |    |
-|   Sparsity   |   | 99.961\% |      |   | 99.899\% |      |   | 99.904\% |     |     |   |  99.970\%  |    |
-
-- `2024.3.20 baselines LLATTICE and MICRO uploaded`: 📢📢📢📢🌹🔥🔥🚀🚀 Because baselines `LATTICE` and `MICRO` require some minor modifications, we provide code that can be easily run by simply modifying the dataset path.
-- `2023.11.1 new multi-modal datastes uploaded`: 📢📢🔥🔥🌹🌹🌹🌹 We provide new multi-modal datasets `Netflix` and `MovieLens`  (i.e., CF training data, multi-modal data including `item text` and `posters`) of new multi-modal work [LLMRec](https://github.com/HKUDS/LLMRec) on Google Drive. 🌹We hope to contribute to our community and facilitate your research~
-
-- `2023.3.23 update(all datasets uploaded)`: We provide the processed data at [Google Drive](https://drive.google.com/drive/folders/1AB1RsnU-ETmubJgWLpJrXd8TjaK_eTp0?usp=share_link). 
-- `2023.3.24 update`: The official website of the `Tiktok` dataset has been closed. Thus, we also provide many other versions of preprocessed [Tiktok](https://drive.google.com/drive/folders/1hLvoS7F0R_K0HBixuS_OVXw_WbBxnshF?usp=share_link).  We spent a lot of time pre-processing this dataset, so if you want to use our preprocessed Tiktok in your work please cite.
-
-🚀🚀 The provided dataset is compatible with multi-modal recommender models such as [MMSSL](https://github.com/HKUDS/MMSSL), [LATTICE](https://github.com/CRIPAC-DIG/LATTICE), and [MICRO](https://github.com/CRIPAC-DIG/MICRO) and requires no additional data preprocessing, including (1) basic user-item interactions and (2) multi-modal features.
-
-
-<h3> Multi-modal Datasets </h3>
-🌹🌹 Please cite our paper if you use the 'netflix' dataset~ ❤️  
-
-We collected a multi-modal dataset using the original [Netflix Prize Data](https://www.kaggle.com/datasets/netflix-inc/netflix-prize-data) released on the [Kaggle](https://www.kaggle.com/) website. The data format is directly compatible with state-of-the-art multi-modal recommendation models like [LLMRec](https://github.com/HKUDS/LLMRec), [MMSSL](https://github.com/HKUDS/MMSSL), [LATTICE](https://github.com/CRIPAC-DIG/LATTICE), [MICRO](https://github.com/CRIPAC-DIG/MICRO), and others, without requiring any additional data preprocessing.
-
- `Textual Modality:` We have released the item information curated from the original dataset in the "item_attribute.csv" file. Additionally, we have incorporated textual information enhanced by LLM into the "augmented_item_attribute_agg.csv" file. (The following three images represent (1) information about Netflix as described on the Kaggle website, (2) textual information from the original Netflix Prize Data, and (3) textual information augmented by LLMs.)
-<div style="display: flex; justify-content: center; align-items: flex-start;">
-  <figure style="text-align: center; margin: 10px;">
-   <img src="./image/textual_data1.png" alt="Image 1" style="width:270px;height:180px;">
-<!--     <figcaption>Textual data in original 'Netflix Prize Data' on Kaggle.</figcaption> -->
-  </figure>
-
-  <figure style="text-align: center; margin: 10px;">
-    <img src="./image/textual_data2.png" alt="Image 2" style="width:270px;height:180px;">
-<!--     <figcaption>Textual data in original 'Netflix Prize Data'.</figcaption> -->
-  </figure>
-
-  <figure style="text-align: center; margin: 10px;">
-    <img src="./image/textual_data3.png" alt="Image 2" style="width:270px;height:180px;">
-<!--     <figcaption>LLM-augmented textual data.</figcaption> -->
-  </figure>  
-</div>
- 
- `Visual Modality:` We have released the visual information obtained from web crawling in the "Netflix_Posters" folder. (The following image displays the poster acquired by web crawling using item information from the Netflix Prize Data.)
- <div style="display: flex; justify-content: center; align-items: flex-start;">
-  <figure style="text-align: center; margin: 10px;">
-   <img src="./image/visiual_data1.png" alt="Image 1" style="width:690px;height:590px;">
-<!--     <figcaption>Textual data in original 'Netflix Prize Data' on Kaggle.</figcaption> -->
-  </figure>
-</div>
- 
-
-<h3> Original Multi-modal Datasets & Augmented Datasets </h3>
- <div style="display: flex; justify-content: center; align-items: flex-start;">
-  <figure style="text-align: center; margin: 10px;">
-   <img src="./image/datasets.png" alt="Image 1" style="width:480px;height:270px;">
-<!--     <figcaption>Textual data in original 'Netflix Prize Data' on Kaggle.</figcaption> -->
-  </figure>
-</div>
-
-
-<br>
-<p>
-
-<h3> Download the Netflix dataset. </h3>
-🚀🚀
-We provide the processed data (i.e., CF training data & basic user-item interactions, original multi-modal data including images and text of items, encoded visual/textual features and LLM-augmented text/embeddings).  🌹 We hope to contribute to our community and facilitate your research 🚀🚀 ~
-
-- `netflix`: [Google Drive Netflix](https://drive.google.com/drive/folders/1BGKm3nO4xzhyi_mpKJWcfxgi3sQ2j_Ec?usp=drive_link).  [🌟(Image&Text)](https://drive.google.com/file/d/1euAnMYD1JBPflx0M86O2M9OsbBSfrzPK/view?usp=drive_link)
-
-
-
-<h3> Encoding the Multi-modal Content. </h3>
-
-We use [CLIP-ViT](https://huggingface.co/openai/clip-vit-base-patch32) and [Sentence-BERT](https://www.sbert.net/) separately as encoders for visual side information and textual side information.
-
-
-
-<h1> Citing </h1>
-
-If you find this work helpful to your research, please kindly consider citing our paper.
-
-
-```
-@inproceedings{wei2023multi,
-  title={Multi-Modal Self-Supervised Learning for Recommendation},
-  author={Wei, Wei and Huang, Chao and Xia, Lianghao and Zhang, Chuxu},
-  booktitle={Proceedings of the ACM Web Conference 2023},
-  pages={790--800},
-  year={2023}
-}
-```
-<!-- or -->
-
-<!-- @inproceedings{wei2023multi,
-  title={Multi-Modal Self-Supervised Learning for Recommendation},
-  author={Wei, Wei and Huang, Chao and Xia, Lianghao and Zhang, Chuxu},
-  booktitle={Proceedings of the Web Conference (WWW)},
-  year={2023}
-}
- -->
-
-
-## Acknowledgement
-
-The structure of this code is largely based on [LATTICE](https://github.com/CRIPAC-DIG/LATTICE), [MICRO](https://github.com/CRIPAC-DIG/MICRO). Thank them for their work.
-
-adoop-ai-search@psx3eevxria5um28-worker-0:/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05$ ^C
+Set the environment variable HYDRA_FULL_ERROR=1 for a complete stack trace.
++ echo 'Error: Round 1 Challenger training failed'
+hadoop-ai-search@psx3eevxria5um28-worker-0:/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05$ Error: Round 1 Challenger training failed
++ exit 1
+INFO 03-01 21:25:50 [model.py:547] Resolved architecture: Qwen2ForCausalLM
+`torch_dtype` is deprecated! Use `dtype` instead!
+INFO 03-01 21:25:50 [model.py:1510] Using max model len 4096
+INFO 03-01 21:25:50 [scheduler.py:205] Chunked prefill is enabled with max_num_batched_tokens=16384.
+INFO 03-01 21:25:57 [model.py:547] Resolved architecture: Qwen2ForCausalLM
+`torch_dtype` is deprecated! Use `dtype` instead!
+INFO 03-01 21:25:57 [model.py:1510] Using max model len 4096
+INFO 03-01 21:25:57 [scheduler.py:205] Chunked prefill is enabled with max_num_batched_tokens=16384.
+INFO 03-01 21:26:00 [model.py:547] Resolved architecture: Qwen2ForCausalLM
+`torch_dtype` is deprecated! Use `dtype` instead!
+INFO 03-01 21:26:00 [model.py:1510] Using max model len 4096
+INFO 03-01 21:26:00 [scheduler.py:205] Chunked prefill is enabled with max_num_batched_tokens=16384.
+^C
+hadoop-ai-search@psx3eevxria5um28-worker-0:/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05$ ^C
+hadoop-ai-search@psx3eevxria5um28-worker-0:/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05$ INFO 03-01 21:26:13 [model.py:547] Resolved architecture: Qwen2ForCausalLM
+`torch_dtype` is deprecated! Use `dtype` instead!
+INFO 03-01 21:26:13 [model.py:1510] Using max model len 4096
+INFO 03-01 21:26:13 [scheduler.py:205] Chunked prefill is enabled with max_num_batched_tokens=16384.
+^C
+hadoop-ai-search@psx3eevxria5um28-worker-0:/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05$ ^C
 hadoop-ai-search@psx3eevxria5um28-worker-0:/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05$ /usr/local/lib/python3.12/dist-packages/torch/cuda/__init__.py:63: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
   import pynvml  # type: ignore[import]
 /usr/local/lib/python3.12/dist-packages/torch/cuda/__init__.py:63: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
