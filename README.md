@@ -1,4 +1,8 @@
-ally (you may need to reboot to free file handles)
+(base) [hadoop-ai-search@psx3gw6xria5rpsd-worker-0 docker]$ conda list
+WARNING conda.gateways.disk.delete:unlink_or_rename_to_trash(184): Could not remove or rename /usr/local/conda/conda-meta/pydantic-2.10.3-py310h06a4308_0.json.  Please remove this file manually (you may need to reboot to free file handles)
+WARNING conda.gateways.disk.delete:unlink_or_rename_to_trash(184): Could not remove or rename /usr/local/conda/conda-meta/typing_extensions-4.12.2-py310h06a4308_0.json.  Please remove this file manually (you may need to reboot to free file handles)
+WARNING conda.gateways.disk.delete:unlink_or_rename_to_trash(184): Could not remove or rename /usr/local/conda/conda-meta/pydantic-core-2.27.1-py310h4aa5aa6_0.json.  Please remove this file manually (you may need to reboot to free file handles)
+WARNING conda.gateways.disk.delete:unlink_or_rename_to_trash(184): Could not remove or rename /usr/local/conda/conda-meta/pip-25.0-py310h06a4308_0.json.  Please remove this file manually (you may need to reboot to free file handles)
 # packages in environment at /usr/local/conda:
 #
 # Name                    Version                   Build  Channel
@@ -641,3 +645,339 @@ zlib                      1.2.13               h5eee18b_1
 zstandard                 0.23.0          py310h2c38b39_1  
 zstd                      1.5.6                hc292b87_0  
 (base) [hadoop-ai-search@psx3gw6xria5rpsd-worker-0 docker]$ conda  install flask scikit-learn stopit 
+WARNING conda.gateways.disk.delete:unlink_or_rename_to_trash(184): Could not remove or rename /usr/local/conda/conda-meta/pydantic-core-2.27.1-py310h4aa5aa6_0.json.  Please remove this file manually (you may need to reboot to free file handles)
+WARNING conda.gateways.disk.delete:unlink_or_rename_to_trash(184): Could not remove or rename /usr/local/conda/conda-meta/pydantic-2.10.3-py310h06a4308_0.json.  Please remove this file manually (you may need to reboot to free file handles)
+WARNING conda.gateways.disk.delete:unlink_or_rename_to_trash(184): Could not remove or rename /usr/local/conda/conda-meta/pip-25.0-py310h06a4308_0.json.  Please remove this file manually (you may need to reboot to free file handles)
+WARNING conda.gateways.disk.delete:unlink_or_rename_to_trash(184): Could not remove or rename /usr/local/conda/conda-meta/typing_extensions-4.12.2-py310h06a4308_0.json.  Please remove this file manually (you may need to reboot to free file handles)
+Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x7f463b0bf910>: Failed to resolve 'repo.anaconda.com' ([Errno -2] Name or service not known)")': /pkgs/main/tos.json
+
+Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x7f4639684160>: Failed to resolve 'repo.anaconda.com' ([Errno -2] Name or service not known)")': /pkgs/main/tos.json
+
+Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x7f4639684be0>: Failed to resolve 'repo.anaconda.com' ([Errno -2] Name or service not known)")': /pkgs/main/tos.json
+
+Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x7f4639685360>: Failed to resolve 'repo.anaconda.com' ([Errno -2] Name or service not known)")': /pkgs/r/tos.json
+
+Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x7f46396855d0>: Failed to resolve 'repo.anaconda.com' ([Errno -2] Name or service not known)")': /pkgs/r/tos.json
+
+^C
+CondaError: KeyboardInterrupt
+
+(base) [hadoop-ai-search@psx3gw6xria5rpsd-worker-0 docker]$ 
+(base) [hadoop-ai-search@psx3gw6xria5rpsd-worker-0 docker]$ pip list
+Package                            Version
+---------------------------------- -------------------------------------
+absl-py                            2.3.1
+accelerate                         1.10.1
+aiohappyeyeballs                   2.6.1
+aiohttp                            3.12.15
+aiohttp-cors                       0.8.1
+aiosignal                          1.4.0
+airportsdata                       20250811
+anaconda-anon-usage                0.5.0
+annotated-types                    0.6.0
+anthropic                          0.64.0
+antlr4-python3-runtime             4.9.3
+anyio                              4.10.0
+archspec                           0.2.3
+argon2-cffi                        25.1.0
+argon2-cffi-bindings               25.1.0
+arrow                              1.4.0
+astor                              0.8.1
+asttokens                          3.0.0
+async-lru                          2.0.5
+async-timeout                      5.0.1
+attrs                              25.3.0
+babel                              2.18.0
+beautifulsoup4                     4.14.3
+blake3                             1.0.5
+bleach                             6.3.0
+blinker                            1.9.0
+boltons                            24.1.0
+Brotli                             1.0.9
+cachetools                         5.5.2
+certifi                            2025.1.31
+cffi                               1.17.1
+cfgv                               3.4.0
+charset-normalizer                 3.3.2
+click                              8.2.1
+cloudpickle                        3.1.1
+codetiming                         1.4.0
+colorful                           0.5.7
+comm                               0.2.3
+compressed-tensors                 0.9.1
+conda                              25.1.1
+conda-anaconda-telemetry           0.1.2
+conda-anaconda-tos                 0.1.2
+conda-content-trust                0.2.0
+conda-libmamba-solver              25.1.1
+conda-package-handling             2.4.0
+conda_package_streaming            0.11.0
+cryptography                       43.0.3
+cuda-bindings                      12.9.0
+cuda-python                        12.9.0
+datasets                           4.0.0
+debugpy                            1.8.20
+decorator                          5.2.1
+decord                             0.6.0
+deep_ep                            1.1.0+c668471
+defusedxml                         0.7.1
+depyf                              0.18.0
+dill                               0.3.8
+diskcache                          5.6.3
+distlib                            0.4.0
+distro                             1.9.0
+docopt                             0.6.2
+einops                             0.8.1
+exceptiongroup                     1.3.0
+executing                          2.2.1
+fastapi                            0.116.1
+fastjsonschema                     2.21.2
+fastuuid                           0.12.0
+filelock                           3.19.1
+flash_attn                         2.7.4.post1
+flashinfer-python                  0.2.5
+Flask                              3.1.3
+fqdn                               1.5.1
+frozendict                         2.4.2
+frozenlist                         1.7.0
+fsspec                             2025.3.0
+gguf                               0.10.0
+gitdb                              4.0.12
+GitPython                          3.1.45
+google-api-core                    2.25.1
+google-auth                        2.40.3
+googleapis-common-protos           1.70.0
+grpcio                             1.74.0
+h11                                0.16.0
+hf_transfer                        0.1.9
+hf-xet                             1.1.9
+hope                               3.6.8
+httpcore                           1.0.9
+httptools                          0.6.4
+httpx                              0.28.1
+huggingface-hub                    0.34.4
+hydra-core                         1.3.2
+identify                           2.6.14
+idna                               3.7
+importlib_metadata                 8.7.0
+interegular                        0.3.3
+iocursor                           0.1.4
+ipykernel                          7.2.0
+ipython                            8.37.0
+ipywidgets                         8.1.8
+isoduration                        20.11.0
+itsdangerous                       2.2.0
+jedi                               0.19.2
+Jinja2                             3.1.6
+jiter                              0.10.0
+joblib                             1.5.3
+json5                              0.13.0
+jsonpatch                          1.33
+jsonpointer                        2.1
+jsonschema                         4.24.1
+jsonschema-specifications          2025.4.1
+jupyter                            1.1.1
+jupyter_client                     8.8.0
+jupyter-console                    6.6.3
+jupyter_core                       5.9.1
+jupyter-events                     0.12.0
+jupyter-lsp                        2.3.0
+jupyter_server                     2.17.0
+jupyter_server_terminals           0.5.4
+jupyterlab                         4.5.5
+jupyterlab_pygments                0.3.0
+jupyterlab_server                  2.28.0
+jupyterlab_widgets                 3.0.16
+lark                               1.2.2
+latex2sympy2_extended              1.10.2
+libmambapy                         2.0.5
+litellm                            1.76.1
+llguidance                         1.2.0
+lm-format-enforcer                 0.10.12
+Markdown                           3.9
+markdown-it-py                     2.2.0
+MarkupSafe                         3.0.2
+math-verify                        0.8.0
+matplotlib-inline                  0.1.7
+mdurl                              0.1.0
+menuinst                           2.2.0
+mistral_common                     1.8.4
+mistune                            3.2.0
+modelscope                         1.29.2
+mpmath                             1.3.0
+msgpack                            1.1.1
+msgspec                            0.19.0
+multidict                          6.6.4
+multiprocess                       0.70.16
+nbclient                           0.10.4
+nbconvert                          7.17.0
+nbformat                           5.10.4
+nest-asyncio                       1.6.0
+networkx                           3.4.2
+ninja                              1.13.0
+nodeenv                            1.9.1
+notebook                           7.5.4
+notebook_shim                      0.2.4
+numpy                              1.26.4
+nvidia-cublas-cu12                 12.4.5.8
+nvidia-cuda-cupti-cu12             12.4.127
+nvidia-cuda-nvrtc-cu12             12.4.127
+nvidia-cuda-runtime-cu12           12.4.127
+nvidia-cudnn-cu12                  9.1.0.70
+nvidia-cufft-cu12                  11.2.1.3
+nvidia-curand-cu12                 10.3.5.147
+nvidia-cusolver-cu12               11.6.1.9
+nvidia-cusparse-cu12               12.3.1.170
+nvidia-cusparselt-cu12             0.6.2
+nvidia-ml-py                       13.580.65
+nvidia-nccl-cu12                   2.21.5
+nvidia-nvjitlink-cu12              12.4.127
+nvidia-nvtx-cu12                   12.4.127
+omegaconf                          2.3.0
+openai                             1.103.0
+openai-harmony                     0.0.3
+opencensus                         0.11.4
+opencensus-context                 0.1.3
+opencv-python-headless             4.11.0.86
+opentelemetry-api                  1.36.0
+opentelemetry-exporter-prometheus  0.57b0
+opentelemetry-proto                1.36.0
+opentelemetry-sdk                  1.36.0
+opentelemetry-semantic-conventions 0.57b0
+orjson                             3.11.3
+outlines                           0.1.11
+outlines_core                      0.1.26
+overrides                          7.7.0
+packaging                          24.2
+pandas                             2.3.2
+pandocfilters                      1.5.1
+parso                              0.8.5
+partial-json-parser                0.2.1.1.post6
+pathspec                           0.12.1
+peft                               0.17.1
+pexpect                            4.9.0
+pillow                             11.3.0
+pip                                25.1.1
+platformdirs                       3.10.0
+pluggy                             1.5.0
+pre_commit                         4.3.0
+prettytable                        3.16.0
+prometheus_client                  0.22.1
+prometheus-fastapi-instrumentator  7.1.0
+prompt_toolkit                     3.0.52
+propcache                          0.3.2
+proto-plus                         1.26.1
+protobuf                           6.32.0
+psutil                             7.0.0
+ptyprocess                         0.7.0
+pure_eval                          0.2.3
+py-cpuinfo                         9.0.0
+py-spy                             0.4.1
+pyarrow                            21.0.0
+pyasn1                             0.6.1
+pyasn1_modules                     0.4.2
+pybind11                           3.0.1
+pycosat                            0.6.6
+pycountry                          24.6.1
+pycparser                          2.21
+pydantic                           2.11.7
+pydantic_core                      2.33.2
+pydantic-extra-types               2.10.5
+Pygments                           2.15.1
+pylatexenc                         2.10
+PySocks                            1.7.1
+python-cat                         0.0.11
+python-dateutil                    2.9.0.post0
+python-dotenv                      1.1.0
+python-json-logger                 4.0.0
+python-multipart                   0.0.20
+pytz                               2025.2
+PyYAML                             6.0.2
+pyzmq                              27.0.2
+ray                                2.49.1
+referencing                        0.36.2
+regex                              2025.9.1
+requests                           2.32.3
+rfc3339-validator                  0.1.4
+rfc3986-validator                  0.1.1
+rich                               13.9.4
+rpds-py                            0.27.1
+rsa                                4.9.1
+ruamel.yaml                        0.18.6
+ruamel.yaml.clib                   0.2.8
+safetensors                        0.6.2
+scikit_build_core                  0.11.6
+scikit-learn                       1.7.2
+scipy                              1.15.3
+Send2Trash                         2.1.0
+sentencepiece                      0.2.1
+sentry-sdk                         2.37.0
+setproctitle                       1.3.6
+setuptools                         75.8.0
+setuptools-scm                     9.2.0
+sgl-kernel                         0.3.1
+sglang                             0.4.3.post2
+six                                1.17.0
+smart-open                         7.1.0
+smmap                              5.0.2
+sniffio                            1.3.1
+soupsieve                          2.8.3
+stack-data                         0.6.3
+starlette                          0.47.3
+stopit                             1.1.2
+sympy                              1.13.1
+tensorboard                        2.19.0
+tensorboard-data-server            0.7.2
+tensordict                         0.8.0
+terminado                          0.18.1
+threadpoolctl                      3.6.0
+thrift                             0.21.0
+tiktoken                           0.11.0
+tinycss2                           1.4.0
+tokenizers                         0.21.4
+tomli                              2.2.1
+torch                              2.6.0
+torch_memory_saver                 0.0.5
+torchao                            0.11.0
+torchdata                          0.11.0
+torchvision                        0.21.0
+tornado                            6.5.4
+tqdm                               4.67.1
+traitlets                          5.14.3
+transformers                       4.55.0
+triton                             3.2.0
+truststore                         0.10.0
+typing_extensions                  4.15.0
+typing-inspection                  0.4.1
+tzdata                             2025.2
+uri-template                       1.3.0
+urllib3                            2.3.0
+uv                                 0.8.14
+uvicorn                            0.34.2
+uvloop                             0.21.0
+virtualenv                         20.34.0
+vllm                               0.7.3.dev0+g0408efc6d.d20250904.cu124
+wandb                              0.21.3
+watchfiles                         1.0.5
+wcwidth                            0.2.13
+webcolors                          25.10.0
+webencodings                       0.5.1
+websocket-client                   1.9.0
+websockets                         15.0.1
+Werkzeug                           3.1.3
+wheel                              0.45.1
+widgetsnbextension                 4.0.15
+wrapt                              1.17.3
+xformers                           0.0.28.post3+f3bc7a78.d20250903
+xgrammar                           0.1.23
+xxhash                             3.5.0
+yarl                               1.20.1
+zipp                               3.23.0
+zstandard                          0.23.0
+(base) [hadoop-ai-search@psx3gw6xria5rpsd-worker-0 docker]$ which python
+/usr/local/conda/bin/python
+(base) [hadoop-ai-search@psx3gw6xria5rpsd-worker-0 docker]$ which pip
+/usr/local/conda/bin/pip
+(base) [hadoop-ai-search@psx3gw6xria5rpsd-worker-0 docker]$ python -V
+Python 3.10.16
+(base) [hadoop-ai-search@psx3gw6xria5rpsd-worker-0 docker]$ 
