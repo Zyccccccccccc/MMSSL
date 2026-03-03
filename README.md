@@ -8,7 +8,7 @@ Ray init success {'node:__internal_head__': 1.0, 'node:10.148.63.41': 1.0, 'memo
 Ray init success {'CPU': 56.0, 'accelerator_type:A800': 1.0, 'node:__internal_head__': 1.0, 'object_store_memory': 102005465497.0, 'node:10.148.63.41': 1.0, 'memory': 900423188070.0, 'GPU': 8.0}
 (base) [hadoop-ai-search@psx3gw6xria5rpsd-worker-0 docker]$ 
 
-
+export RAY_raylet_start_wait_time_s=60
 
 #!/usr/bin/env bash
 
