@@ -1,1 +1,1 @@
-cat ~/.ray/ray-client.cfg 2>/dev/null; cat /tmp/ray_bootstrap_config.yaml 2>/dev/null; find ~ -name "*.ray*" 2>/dev/null
+python -c 'import ray; ray.init(address="local", include_dashboard=False); print("Ray init success", ray.cluster_resources()); ray.shutdown()'
