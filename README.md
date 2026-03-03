@@ -11,79 +11,333 @@ Ray init success {'CPU': 56.0, 'accelerator_type:A800': 1.0, 'node:__internal_he
 export RAY_raylet_start_wait_time_s=60
 
 
-Waiting for vLLM service to start...
-Starting main training process...
-Using GPU: 0,1,2,3, total 4
-INFO 03-03 22:40:18 __init__.py:190] Automatically detected platform cuda.
-INFO 03-03 22:40:18 __init__.py:190] Automatically detected platform cuda.
-INFO 03-03 22:40:18 __init__.py:190] Automatically detected platform cuda.
-INFO 03-03 22:40:18 __init__.py:190] Automatically detected platform cuda.
-Traceback (most recent call last):
-  File "/usr/local/conda/lib/python3.10/site-packages/hydra/_internal/utils.py", line 220, in run_and_report
-    return func()
-  File "/usr/local/conda/lib/python3.10/site-packages/hydra/_internal/utils.py", line 458, in <lambda>
-    lambda: hydra.run(
-  File "/usr/local/conda/lib/python3.10/site-packages/hydra/_internal/hydra.py", line 105, in run
-    cfg = self.compose_config(
-  File "/usr/local/conda/lib/python3.10/site-packages/hydra/_internal/hydra.py", line 594, in compose_config
-    cfg = self.config_loader.load_configuration(
-  File "/usr/local/conda/lib/python3.10/site-packages/hydra/_internal/config_loader_impl.py", line 142, in load_configuration
-    return self._load_configuration_impl(
-  File "/usr/local/conda/lib/python3.10/site-packages/hydra/_internal/config_loader_impl.py", line 253, in _load_configuration_impl
-    defaults_list = create_defaults_list(
-  File "/usr/local/conda/lib/python3.10/site-packages/hydra/_internal/defaults_list.py", line 745, in create_defaults_list
-    defaults, tree = _create_defaults_list(
-  File "/usr/local/conda/lib/python3.10/site-packages/hydra/_internal/defaults_list.py", line 715, in _create_defaults_list
-    defaults_tree = _create_defaults_tree(
-  File "/usr/local/conda/lib/python3.10/site-packages/hydra/_internal/defaults_list.py", line 356, in _create_defaults_tree
-    ret = _create_defaults_tree_impl(
-  File "/usr/local/conda/lib/python3.10/site-packages/hydra/_internal/defaults_list.py", line 457, in _create_defaults_tree_impl
-    return _expand_virtual_root(repo, root, overrides, skip_missing)
-  File "/usr/local/conda/lib/python3.10/site-packages/hydra/_internal/defaults_list.py", line 280, in _expand_virtual_root
-    subtree = _create_defaults_tree_impl(
-  File "/usr/local/conda/lib/python3.10/site-packages/hydra/_internal/defaults_list.py", line 573, in _create_defaults_tree_impl
-    add_child(children, new_root)
-  File "/usr/local/conda/lib/python3.10/site-packages/hydra/_internal/defaults_list.py", line 520, in add_child
-    subtree_ = _create_defaults_tree_impl(
-  File "/usr/local/conda/lib/python3.10/site-packages/hydra/_internal/defaults_list.py", line 466, in _create_defaults_tree_impl
-    update_package_header(repo=repo, node=parent)
-  File "/usr/local/conda/lib/python3.10/site-packages/hydra/_internal/defaults_list.py", line 262, in update_package_header
-    loaded = repo.load_config(config_path=node.get_config_path())
-  File "/usr/local/conda/lib/python3.10/site-packages/hydra/_internal/config_repository.py", line 348, in load_config
-    ret = self.delegate.load_config(config_path=config_path)
-  File "/usr/local/conda/lib/python3.10/site-packages/hydra/_internal/config_repository.py", line 91, in load_config
-    ret = source.load_config(config_path=config_path)
-  File "/usr/local/conda/lib/python3.10/site-packages/hydra/_internal/core_plugins/file_config_source.py", line 31, in load_config
-    cfg = OmegaConf.load(f)
-  File "/usr/local/conda/lib/python3.10/site-packages/omegaconf/omegaconf.py", line 192, in load
-    obj = yaml.load(file_, Loader=get_yaml_loader())
-  File "/usr/local/conda/lib/python3.10/site-packages/yaml/__init__.py", line 81, in load
-    return loader.get_single_data()
-  File "/usr/local/conda/lib/python3.10/site-packages/yaml/constructor.py", line 49, in get_single_data
-    node = self.get_single_node()
-  File "/usr/local/conda/lib/python3.10/site-packages/yaml/composer.py", line 36, in get_single_node
-    document = self.compose_document()
-  File "/usr/local/conda/lib/python3.10/site-packages/yaml/composer.py", line 55, in compose_document
-    node = self.compose_node(None, None)
-  File "/usr/local/conda/lib/python3.10/site-packages/yaml/composer.py", line 84, in compose_node
-    node = self.compose_mapping_node(anchor)
-  File "/usr/local/conda/lib/python3.10/site-packages/yaml/composer.py", line 133, in compose_mapping_node
-    item_value = self.compose_node(node, item_key)
-  File "/usr/local/conda/lib/python3.10/site-packages/yaml/composer.py", line 84, in compose_node
-    node = self.compose_mapping_node(anchor)
-  File "/usr/local/conda/lib/python3.10/site-packages/yaml/composer.py", line 127, in compose_mapping_node
-    while not self.check_event(MappingEndEvent):
-  File "/usr/local/conda/lib/python3.10/site-packages/yaml/parser.py", line 98, in check_event
-    self.current_event = self.state()
-  File "/usr/local/conda/lib/python3.10/site-packages/yaml/parser.py", line 428, in parse_block_mapping_key
-    if self.check_token(KeyToken):
-  File "/usr/local/conda/lib/python3.10/site-packages/yaml/scanner.py", line 116, in check_token
-    self.fetch_more_tokens()
-  File "/usr/local/conda/lib/python3.10/site-packages/yaml/scanner.py", line 223, in fetch_more_tokens
-    return self.fetch_value()
-  File "/usr/local/conda/lib/python3.10/site-packages/yaml/scanner.py", line 577, in fetch_value
-    raise ScannerError(None, None,
-yaml.scanner.ScannerError: mapping values are not allowed here
-  in "/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/TTCS/verl/trainer/config/ppo_trainer.yaml", line 324, column 30
-+ echo 'Error: Round 1 Challenger training failed'
-Error: Round 1 Challenger training failed
+# Format checks enforced on CI:
+# 1. Comments must appear above each field.
+# 2. There must be a blank line between each field.
+# 3. Inline comments (after a field on the same line) are not allowed.
+# 4. Indentation level is respected for nested fields.
+
+# specify the default per-component configs
+defaults:
+
+  # <folder_name>@<field_name>.<field_name>: <yaml_file_name>
+  # actor_rollout_ref.actor: trainer/config/actor/dp_actor.yaml
+  - actor@actor_rollout_ref.actor: dp_actor
+
+  # data: trainer/config/data/legacy_data.yaml
+  - data@data: legacy_data
+
+  # Reference model config.
+  # Reference model will be enabled when actor.use_kl_loss or/and algorithm.use_kl_in_reward is/are True.
+  - ref@actor_rollout_ref.ref: dp_ref
+
+  # Rollout model config.
+  - rollout@actor_rollout_ref.rollout: rollout
+
+  # Model config.
+  - model@actor_rollout_ref.model: hf_model
+
+  # Critic model config.
+  - critic@critic: dp_critic
+
+  # Reward model config.
+  - reward_model@reward_model: dp_reward_model
+
+  # load the reference default config, then apply the fields in the current yaml
+  # self config override anything above
+  - _self_
+
+# config for actor, rollout and reference model
+actor_rollout_ref:
+
+  # Whether it's a hybrid engine, currently only supports hybrid engine
+  hybrid_engine: true
+
+  # Timeout for operations executed against the process group
+  nccl_timeout: 600
+
+  # Rollout model config.
+  rollout:
+
+    # for huge model, layered summon can save memory (prevent OOM) but make it slower
+    layered_summon: False
+
+# custom reward function definition
+custom_reward_function:
+
+  # The path to the file containing your customized reward function.
+  # If not specified, pre-implemented reward functions will be used.
+  path: null
+
+  # The name of the reward function within the specified file. Default is 'compute_score'.
+  name: compute_score
+
+# config for the algorithm
+algorithm:
+
+  # Required when using verl.utils.omega_conf_to_dataclass to instantiate dataclass configs
+  _target_: verl.trainer.config.AlgoConfig
+
+  # Discount factor for future rewards
+  gamma: 1.0
+
+  # Trade-off between bias and variance in the GAE estimator
+  lam: 1.0
+
+  # Advantage estimator type: "gae", "grpo", "reinforce_plus_plus", etc.
+  adv_estimator: gae
+
+  # Whether to normalize advantages by std (specific to GRPO)
+  norm_adv_by_std_in_grpo: True
+
+  # Whether to enable in-reward KL penalty
+  use_kl_in_reward: False
+
+  # How to estimate KL divergence: "kl", "abs", "mse", "low_var_kl", or "full"
+  kl_penalty: kl
+
+  # KL control configuration
+  kl_ctrl:
+
+    # Required when using verl.utils.omega_conf_to_dataclass to instantiate dataclass configs
+    _target_: verl.trainer.config.KLControlConfig
+
+    # KL control type: "fixed" or "adaptive"
+    type: fixed
+
+    # Initial coefficient for KL penalty
+    kl_coef: 0.001
+
+    # Horizon value for adaptive controller (if enabled)
+    horizon: 10000
+
+    # Target KL divergence (used for adaptive controller)
+    target_kl: 0.1
+
+  # Whether to enable preference feedback PPO
+  use_pf_ppo: False
+
+  # Preference feedback PPO settings
+  pf_ppo:
+
+    # Method for reweighting samples: "pow", "max_min", or "max_random"
+    reweight_method: pow
+
+    # Power used for weight scaling in "pow" method
+    weight_pow: 2.0
+
+  # Rollout Importance Sampling: corrects distribution mismatch between rollout and training policies
+  # Main control: Upper threshold for IS weights (null = disabled, float = enabled)
+  # When enabled, computes IS weights and mismatch metrics (KL, PPL, etc.)
+  rollout_is_threshold: null
+
+  # Lower threshold for IS weights (null = auto-reciprocal of upper)
+  rollout_is_threshold_lower: null
+
+  # Aggregation level: "token" (biased), "sequence" (unbiased), "geometric" (experimental)
+  rollout_is_level: token
+
+  # Bounding mode: "truncate" (cap upper only), "mask" (zero outside bounds)
+  rollout_is_mode: truncate
+
+  # Per-token veto threshold for catastrophic outliers
+  rollout_is_veto_threshold: 1e-4
+
+  # Whether to apply IS weights to policy loss
+  # true = apply weights to loss, false = compute metrics only (no weight application)
+  # Useful for monitoring mismatch before enabling correction
+  rollout_is: false
+
+# config for the trainer
+trainer:
+
+  # Whether to balance batch sizes across distributed workers
+  balance_batch: True
+
+  # Number of epochs in training
+  total_epochs: 30
+
+  # Total training steps (can be set explicitly or derived from epochs)
+  total_training_steps: null
+
+  # Project name for experiment tracking (e.g., wandb)
+  project_name: verl_examples
+
+  # Experiment name for run identification in tracking tools
+  experiment_name: gsm8k
+
+  # Logging backends to use: "console", "wandb", etc.
+  logger: ["console", "wandb"]
+
+  # Number of generations to log during validation
+  log_val_generations: 0
+
+  # Directory for logging rollout data; no dump if null
+  rollout_data_dir: null
+
+  # Directory for logging validation data; no dump if null
+  validation_data_dir: null
+
+  # Number of nodes used in the training
+  nnodes: 1
+
+  # Number of GPUs per node
+  n_gpus_per_node: 8
+
+  # Save frequency (by iteration) for model checkpoints
+  save_freq: -1
+
+  # ESI refers to the elastic server instance used during training, similar to the training plan. For example,
+  # if you purchase 10 hours of computing power, the ESI will automatically shut down after 10 hours of training.
+  # To ensure a checkpoint is saved before ESI shuts down, the system will start saving a checkpoint in advance.
+  # The advance time is calculated as: Advance Time = Longest historical step duration + Checkpoint save duration + esi_redundant_time.
+  # Here, esi_redundant_time is a user-defined value that further extends the advance time for added safety.
+  esi_redundant_time: 0
+
+  # Resume mode: "auto", "disable", or "resume_path"
+  # "auto": resume from last checkpoint if available
+  # "disable": start from scratch
+  # "resume_path": resume from a user-defined path
+  resume_mode: auto
+
+  # Path to resume training from (only used when resume_mode is "resume_path")
+  resume_from_path: null
+
+  # Whether to run validation before training begins
+  val_before_train: True
+
+  # Whether to run validation only
+  val_only: False
+
+  # Validation frequency (in training iterations)
+  test_freq: -1
+
+  # Number of iterations to warm up the critic before updating policy
+  critic_warmup: 0
+
+  # Default path to distributed filesystem for saving checkpoints
+  default_hdfs_dir: null
+
+  # Whether to delete local checkpoints after loading
+  del_local_ckpt_after_load: False
+
+  # Default local directory for saving checkpoints
+  default_local_dir: checkpoints/${trainer.project_name}/${trainer.experiment_name}
+
+  # Maximum number of actor checkpoints to keep
+  max_actor_ckpt_to_keep: null
+
+  # Maximum number of critic checkpoints to keep
+  max_critic_ckpt_to_keep: null
+
+  # Timeout (in seconds) for Ray worker to wait for registration
+  ray_wait_register_center_timeout: 300
+
+  # Device to run training on (e.g., "cuda", "cpu")
+  device: cuda
+
+  # whether to use legacy worker implementation
+  #  mode: "auto", "enable", or "disable"
+  use_legacy_worker_impl: auto
+
+# profiler configs
+global_profiler:
+
+  # Required when using verl.utils.omega_conf_to_dataclass to instantiate dataclass configs
+  _target_: verl.utils.profiler.ProfilerConfig
+
+  # Profiling tool: choose between nsys, npu, torch, torch_memory
+  tool: null
+
+  # profile steps
+  steps: null
+
+  # Whether to combine continuous steps into one database.
+  ## If True, worker.profiler.discrete must be False, [1,2] in one, [5] in another.
+  ## If False, [1] in one, [2] in another, [5] in another.
+  profile_continuous_steps: False
+
+  # Path to save profiling contents
+  save_path: "outputs/profile"
+
+  # Specific tool configs, can use +profiler.tool_config.[tool].xxx to config
+  global_tool_config:
+
+    # nsys config
+    nsys:
+
+      # Required when using verl.utils.omega_conf_to_dataclass to instantiate dataclass configs
+      _target_: verl.utils.profiler.config.NsightToolConfig
+
+      # True for each task has its own database, False for all tasks in one training step share one database.
+      discrete: False
+
+      # controller Nvidia Nsight Systems Options. Must set when profile_steps is not None.
+      ## reference https://docs.nvidia.com/nsight-systems/UserGuide/index.html
+      ## reference https://docs.ray.io/en/latest/ray-observability/user-guides/profiling.html
+      controller_nsight_options:
+
+        # Select the API(s) to be traced.
+        trace: "cuda,nvtx,cublas,ucx"
+
+        # Track the GPU memory usage by CUDA kernels. Must be string type "true" or "false".
+        cuda-memory-usage: "true"
+
+        # CUDA graphs will be traced as a whole
+        cuda-graph-trace: "graph"
+
+      # worker Nvidia Nsight Systems Options. Must set when profile_steps is not None.
+      worker_nsight_options:
+
+        # Select the API(s) to be traced.
+        trace: "cuda,nvtx,cublas,ucx"
+
+        # Track the GPU memory usage by CUDA kernels. Must be string type "true" or "false".
+        cuda-memory-usage: "true"
+
+        # CUDA graphs will be traced as a whole
+        cuda-graph-trace: "graph"
+
+        # Profiling only in a range of torch.cuda.profiler.start and stop. Do not change this config.
+        capture-range: "cudaProfilerApi"
+
+        # Specify the desired behavior when a capture range ends.
+        # In verl we need the torch.cuda.profiler.start/stop pair to repeats n times.
+        # valid values are "repeat-shutdown:n" or null.
+        # For normal whole step profiling, n = len(profile_steps);
+        # but for discrete profiling, n = len(profile_steps) * Number(subtasks).
+        # Or you can just leave it null and the program will use n = len(profile_steps) * 6;
+        capture-range-end: null
+
+        # Send signal to the target application's process group. We let the program to exit by itself.
+        kill: none
+
+    # enable memory visualization for debugging memory usage
+    torch_memory:
+
+      #  Maximum number of allocation entries to record
+      trace_alloc_max_entries: 100_000
+
+      # The depth of the call stack to capture for each allocation
+      stack_depth: 32
+
+      # 'alloc': records only allocation events || 'state': records memory state changes || 'all': records both.
+      context: "all"
+
+      # 'python': records Python stacks || 'cpp': records C++ stacks (available in some versions) || 'all': records both.
+      stacks: "all"
+
+      # devices, record_context etc.
+      kw_args: {}
+
+# configs related to ray
+ray_kwargs:
+
+  # configs related to ray initialization
+  ray_init: include_dashboard: false
+
+    # Number of CPUs for Ray. Use a fixed number instead of null when using SLURM.
+    num_cpus: null
+
+  # Path to save Ray timeline JSON for performance profiling
+  timeline_json_file: null
