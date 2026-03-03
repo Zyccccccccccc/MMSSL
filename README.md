@@ -11,333 +11,253 @@ Ray init success {'CPU': 56.0, 'accelerator_type:A800': 1.0, 'node:__internal_he
 export RAY_raylet_start_wait_time_s=60
 
 
-# Format checks enforced on CI:
-# 1. Comments must appear above each field.
-# 2. There must be a blank line between each field.
-# 3. Inline comments (after a field on the same line) are not allowed.
-# 4. Indentation level is respected for nested fields.
 
-# specify the default per-component configs
-defaults:
-
-  # <folder_name>@<field_name>.<field_name>: <yaml_file_name>
-  # actor_rollout_ref.actor: trainer/config/actor/dp_actor.yaml
-  - actor@actor_rollout_ref.actor: dp_actor
-
-  # data: trainer/config/data/legacy_data.yaml
-  - data@data: legacy_data
-
-  # Reference model config.
-  # Reference model will be enabled when actor.use_kl_loss or/and algorithm.use_kl_in_reward is/are True.
-  - ref@actor_rollout_ref.ref: dp_ref
-
-  # Rollout model config.
-  - rollout@actor_rollout_ref.rollout: rollout
-
-  # Model config.
-  - model@actor_rollout_ref.model: hf_model
-
-  # Critic model config.
-  - critic@critic: dp_critic
-
-  # Reward model config.
-  - reward_model@reward_model: dp_reward_model
-
-  # load the reference default config, then apply the fields in the current yaml
-  # self config override anything above
-  - _self_
-
-# config for actor, rollout and reference model
-actor_rollout_ref:
-
-  # Whether it's a hybrid engine, currently only supports hybrid engine
-  hybrid_engine: true
-
-  # Timeout for operations executed against the process group
-  nccl_timeout: 600
-
-  # Rollout model config.
-  rollout:
-
-    # for huge model, layered summon can save memory (prevent OOM) but make it slower
-    layered_summon: False
-
-# custom reward function definition
-custom_reward_function:
-
-  # The path to the file containing your customized reward function.
-  # If not specified, pre-implemented reward functions will be used.
-  path: null
-
-  # The name of the reward function within the specified file. Default is 'compute_score'.
-  name: compute_score
-
-# config for the algorithm
-algorithm:
-
-  # Required when using verl.utils.omega_conf_to_dataclass to instantiate dataclass configs
-  _target_: verl.trainer.config.AlgoConfig
-
-  # Discount factor for future rewards
-  gamma: 1.0
-
-  # Trade-off between bias and variance in the GAE estimator
-  lam: 1.0
-
-  # Advantage estimator type: "gae", "grpo", "reinforce_plus_plus", etc.
-  adv_estimator: gae
-
-  # Whether to normalize advantages by std (specific to GRPO)
-  norm_adv_by_std_in_grpo: True
-
-  # Whether to enable in-reward KL penalty
-  use_kl_in_reward: False
-
-  # How to estimate KL divergence: "kl", "abs", "mse", "low_var_kl", or "full"
-  kl_penalty: kl
-
-  # KL control configuration
-  kl_ctrl:
-
-    # Required when using verl.utils.omega_conf_to_dataclass to instantiate dataclass configs
-    _target_: verl.trainer.config.KLControlConfig
-
-    # KL control type: "fixed" or "adaptive"
-    type: fixed
-
-    # Initial coefficient for KL penalty
-    kl_coef: 0.001
-
-    # Horizon value for adaptive controller (if enabled)
-    horizon: 10000
-
-    # Target KL divergence (used for adaptive controller)
-    target_kl: 0.1
-
-  # Whether to enable preference feedback PPO
-  use_pf_ppo: False
-
-  # Preference feedback PPO settings
-  pf_ppo:
-
-    # Method for reweighting samples: "pow", "max_min", or "max_random"
-    reweight_method: pow
-
-    # Power used for weight scaling in "pow" method
-    weight_pow: 2.0
-
-  # Rollout Importance Sampling: corrects distribution mismatch between rollout and training policies
-  # Main control: Upper threshold for IS weights (null = disabled, float = enabled)
-  # When enabled, computes IS weights and mismatch metrics (KL, PPL, etc.)
-  rollout_is_threshold: null
-
-  # Lower threshold for IS weights (null = auto-reciprocal of upper)
-  rollout_is_threshold_lower: null
-
-  # Aggregation level: "token" (biased), "sequence" (unbiased), "geometric" (experimental)
-  rollout_is_level: token
-
-  # Bounding mode: "truncate" (cap upper only), "mask" (zero outside bounds)
-  rollout_is_mode: truncate
-
-  # Per-token veto threshold for catastrophic outliers
-  rollout_is_veto_threshold: 1e-4
-
-  # Whether to apply IS weights to policy loss
-  # true = apply weights to loss, false = compute metrics only (no weight application)
-  # Useful for monitoring mismatch before enabling correction
-  rollout_is: false
-
-# config for the trainer
-trainer:
-
-  # Whether to balance batch sizes across distributed workers
-  balance_batch: True
-
-  # Number of epochs in training
-  total_epochs: 30
-
-  # Total training steps (can be set explicitly or derived from epochs)
-  total_training_steps: null
-
-  # Project name for experiment tracking (e.g., wandb)
-  project_name: verl_examples
-
-  # Experiment name for run identification in tracking tools
-  experiment_name: gsm8k
-
-  # Logging backends to use: "console", "wandb", etc.
-  logger: ["console", "wandb"]
-
-  # Number of generations to log during validation
-  log_val_generations: 0
-
-  # Directory for logging rollout data; no dump if null
-  rollout_data_dir: null
-
-  # Directory for logging validation data; no dump if null
-  validation_data_dir: null
-
-  # Number of nodes used in the training
-  nnodes: 1
-
-  # Number of GPUs per node
-  n_gpus_per_node: 8
-
-  # Save frequency (by iteration) for model checkpoints
-  save_freq: -1
-
-  # ESI refers to the elastic server instance used during training, similar to the training plan. For example,
-  # if you purchase 10 hours of computing power, the ESI will automatically shut down after 10 hours of training.
-  # To ensure a checkpoint is saved before ESI shuts down, the system will start saving a checkpoint in advance.
-  # The advance time is calculated as: Advance Time = Longest historical step duration + Checkpoint save duration + esi_redundant_time.
-  # Here, esi_redundant_time is a user-defined value that further extends the advance time for added safety.
-  esi_redundant_time: 0
-
-  # Resume mode: "auto", "disable", or "resume_path"
-  # "auto": resume from last checkpoint if available
-  # "disable": start from scratch
-  # "resume_path": resume from a user-defined path
-  resume_mode: auto
-
-  # Path to resume training from (only used when resume_mode is "resume_path")
-  resume_from_path: null
-
-  # Whether to run validation before training begins
-  val_before_train: True
-
-  # Whether to run validation only
-  val_only: False
-
-  # Validation frequency (in training iterations)
-  test_freq: -1
-
-  # Number of iterations to warm up the critic before updating policy
-  critic_warmup: 0
-
-  # Default path to distributed filesystem for saving checkpoints
-  default_hdfs_dir: null
-
-  # Whether to delete local checkpoints after loading
-  del_local_ckpt_after_load: False
-
-  # Default local directory for saving checkpoints
-  default_local_dir: checkpoints/${trainer.project_name}/${trainer.experiment_name}
-
-  # Maximum number of actor checkpoints to keep
-  max_actor_ckpt_to_keep: null
-
-  # Maximum number of critic checkpoints to keep
-  max_critic_ckpt_to_keep: null
-
-  # Timeout (in seconds) for Ray worker to wait for registration
-  ray_wait_register_center_timeout: 300
-
-  # Device to run training on (e.g., "cuda", "cpu")
-  device: cuda
-
-  # whether to use legacy worker implementation
-  #  mode: "auto", "enable", or "disable"
-  use_legacy_worker_impl: auto
-
-# profiler configs
-global_profiler:
-
-  # Required when using verl.utils.omega_conf_to_dataclass to instantiate dataclass configs
-  _target_: verl.utils.profiler.ProfilerConfig
-
-  # Profiling tool: choose between nsys, npu, torch, torch_memory
-  tool: null
-
-  # profile steps
-  steps: null
-
-  # Whether to combine continuous steps into one database.
-  ## If True, worker.profiler.discrete must be False, [1,2] in one, [5] in another.
-  ## If False, [1] in one, [2] in another, [5] in another.
-  profile_continuous_steps: False
-
-  # Path to save profiling contents
-  save_path: "outputs/profile"
-
-  # Specific tool configs, can use +profiler.tool_config.[tool].xxx to config
-  global_tool_config:
-
-    # nsys config
-    nsys:
-
-      # Required when using verl.utils.omega_conf_to_dataclass to instantiate dataclass configs
-      _target_: verl.utils.profiler.config.NsightToolConfig
-
-      # True for each task has its own database, False for all tasks in one training step share one database.
-      discrete: False
-
-      # controller Nvidia Nsight Systems Options. Must set when profile_steps is not None.
-      ## reference https://docs.nvidia.com/nsight-systems/UserGuide/index.html
-      ## reference https://docs.ray.io/en/latest/ray-observability/user-guides/profiling.html
-      controller_nsight_options:
-
-        # Select the API(s) to be traced.
-        trace: "cuda,nvtx,cublas,ucx"
-
-        # Track the GPU memory usage by CUDA kernels. Must be string type "true" or "false".
-        cuda-memory-usage: "true"
-
-        # CUDA graphs will be traced as a whole
-        cuda-graph-trace: "graph"
-
-      # worker Nvidia Nsight Systems Options. Must set when profile_steps is not None.
-      worker_nsight_options:
-
-        # Select the API(s) to be traced.
-        trace: "cuda,nvtx,cublas,ucx"
-
-        # Track the GPU memory usage by CUDA kernels. Must be string type "true" or "false".
-        cuda-memory-usage: "true"
-
-        # CUDA graphs will be traced as a whole
-        cuda-graph-trace: "graph"
-
-        # Profiling only in a range of torch.cuda.profiler.start and stop. Do not change this config.
-        capture-range: "cudaProfilerApi"
-
-        # Specify the desired behavior when a capture range ends.
-        # In verl we need the torch.cuda.profiler.start/stop pair to repeats n times.
-        # valid values are "repeat-shutdown:n" or null.
-        # For normal whole step profiling, n = len(profile_steps);
-        # but for discrete profiling, n = len(profile_steps) * Number(subtasks).
-        # Or you can just leave it null and the program will use n = len(profile_steps) * 6;
-        capture-range-end: null
-
-        # Send signal to the target application's process group. We let the program to exit by itself.
-        kill: none
-
-    # enable memory visualization for debugging memory usage
-    torch_memory:
-
-      #  Maximum number of allocation entries to record
-      trace_alloc_max_entries: 100_000
-
-      # The depth of the call stack to capture for each allocation
-      stack_depth: 32
-
-      # 'alloc': records only allocation events || 'state': records memory state changes || 'all': records both.
-      context: "all"
-
-      # 'python': records Python stacks || 'cpp': records C++ stacks (available in some versions) || 'all': records both.
-      stacks: "all"
-
-      # devices, record_context etc.
-      kw_args: {}
-
-# configs related to ray
-ray_kwargs:
-
-  # configs related to ray initialization
-  ray_init: include_dashboard: false
-
-    # Number of CPUs for Ray. Use a fixed number instead of null when using SLURM.
-    num_cpus: null
-
-  # Path to save Ray timeline JSON for performance profiling
-  timeline_json_file: null
+INFO 03-03 23:03:17 model_runner.py:1115] Loading model weights took 2.8797 GB
+INFO 03-03 23:03:17 model_runner.py:1110] Starting to load model /mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/Qwen2.5-Math-1.5B...
+Loading safetensors checkpoint shards:   0% Completed | 0/1 [00:00<?, ?it/s]
+[rank0]: Traceback (most recent call last):
+[rank0]:   File "/usr/local/conda/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+[rank0]:     return _run_code(code, main_globals, None,
+[rank0]:   File "/usr/local/conda/lib/python3.10/runpy.py", line 86, in _run_code
+[rank0]:     exec(code, run_globals)
+[rank0]:   File "/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/TTCS/src/start_vllm_server.py", line 288, in <module>
+[rank0]:     initialize_model()
+[rank0]:   File "/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/TTCS/src/start_vllm_server.py", line 67, in initialize_model
+[rank0]:     model = vllm.LLM(
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/utils.py", line 1051, in inner
+[rank0]:     return fn(*args, **kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/entrypoints/llm.py", line 242, in __init__
+[rank0]:     self.llm_engine = self.engine_class.from_engine_args(
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/engine/llm_engine.py", line 484, in from_engine_args
+[rank0]:     engine = cls(
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/engine/llm_engine.py", line 276, in __init__
+[rank0]:     self._initialize_kv_caches()
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/engine/llm_engine.py", line 416, in _initialize_kv_caches
+[rank0]:     self.model_executor.determine_num_available_blocks())
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/executor/executor_base.py", line 101, in determine_num_available_blocks
+[rank0]:     results = self.collective_rpc("determine_num_available_blocks")
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/executor/uniproc_executor.py", line 51, in collective_rpc
+[rank0]:     answer = run_method(self.driver_worker, method, args, kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/utils.py", line 2220, in run_method
+[rank0]:     return func(*args, **kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/torch/utils/_contextlib.py", line 116, in decorate_context
+[rank0]:     return func(*args, **kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/worker/worker.py", line 229, in determine_num_available_blocks
+[rank0]:     self.model_runner.profile_run()
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/torch/utils/_contextlib.py", line 116, in decorate_context
+[rank0]:     return func(*args, **kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/worker/model_runner.py", line 1235, in profile_run
+[rank0]:     self._dummy_run(max_num_batched_tokens, max_num_seqs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/worker/model_runner.py", line 1346, in _dummy_run
+[rank0]:     self.execute_model(model_input, kv_caches, intermediate_tensors)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/torch/utils/_contextlib.py", line 116, in decorate_context
+[rank0]:     return func(*args, **kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/worker/model_runner.py", line 1719, in execute_model
+[rank0]:     hidden_or_intermediate_states = model_executable(
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+[rank0]:     return self._call_impl(*args, **kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+[rank0]:     return forward_call(*args, **kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/model_executor/models/qwen2.py", line 486, in forward
+[rank0]:     hidden_states = self.model(input_ids, positions, kv_caches,
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/compilation/decorators.py", line 172, in __call__
+[rank0]:     return self.forward(*args, **kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/model_executor/models/qwen2.py", line 348, in forward
+[rank0]:     hidden_states, residual = layer(
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+[rank0]:     return self._call_impl(*args, **kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+[rank0]:     return forward_call(*args, **kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/model_executor/models/qwen2.py", line 247, in forward
+[rank0]:     hidden_states = self.self_attn(
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+[rank0]:     return self._call_impl(*args, **kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+[rank0]:     return forward_call(*args, **kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/model_executor/models/qwen2.py", line 176, in forward
+[rank0]:     qkv, _ = self.qkv_proj(hidden_states)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+[rank0]:     return self._call_impl(*args, **kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+[rank0]:     return forward_call(*args, **kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/model_executor/layers/linear.py", line 382, in forward
+[rank0]:     output_parallel = self.quant_method.apply(self, input_, bias)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/model_executor/layers/linear.py", line 142, in apply
+[rank0]:     return F.linear(x, layer.weight, bias)
+[rank0]: RuntimeError: CUDA error: no kernel image is available for execution on the device
+[rank0]: CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+[rank0]: For debugging consider passing CUDA_LAUNCH_BLOCKING=1
+[rank0]: Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+
+[init] Resuming GPU idle worker...
+[idle_worker] GPU idle worker stopped.
+[main] Application shutdown complete.
+INFO 03-03 23:03:18 cuda.py:230] Using Flash Attention backend.
+Loading safetensors checkpoint shards: 100% Completed | 1/1 [00:00<00:00,  2.22it/s]
+Loading safetensors checkpoint shards: 100% Completed | 1/1 [00:00<00:00,  2.22it/s]
+
+[rank0]:[W303 23:03:18.079178563 ProcessGroupNCCL.cpp:1496] Warning: WARNING: destroy_process_group() was not called before program exit, which can leak resources. For more info, please see https://pytorch.org/docs/stable/distributed.html#shutdown (function operator())
+INFO 03-03 23:03:18 model_runner.py:1115] Loading model weights took 2.8797 GB
+[rank0]: Traceback (most recent call last):
+[rank0]:   File "/usr/local/conda/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+[rank0]:     return _run_code(code, main_globals, None,
+[rank0]:   File "/usr/local/conda/lib/python3.10/runpy.py", line 86, in _run_code
+[rank0]:     exec(code, run_globals)
+[rank0]:   File "/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/TTCS/src/start_vllm_server.py", line 288, in <module>
+[rank0]:     initialize_model()
+[rank0]:   File "/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/TTCS/src/start_vllm_server.py", line 67, in initialize_model
+[rank0]:     model = vllm.LLM(
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/utils.py", line 1051, in inner
+[rank0]:     return fn(*args, **kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/entrypoints/llm.py", line 242, in __init__
+[rank0]:     self.llm_engine = self.engine_class.from_engine_args(
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/engine/llm_engine.py", line 484, in from_engine_args
+[rank0]:     engine = cls(
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/engine/llm_engine.py", line 276, in __init__
+[rank0]:     self._initialize_kv_caches()
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/engine/llm_engine.py", line 416, in _initialize_kv_caches
+[rank0]:     self.model_executor.determine_num_available_blocks())
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/executor/executor_base.py", line 101, in determine_num_available_blocks
+[rank0]:     results = self.collective_rpc("determine_num_available_blocks")
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/executor/uniproc_executor.py", line 51, in collective_rpc
+[rank0]:     answer = run_method(self.driver_worker, method, args, kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/utils.py", line 2220, in run_method
+[rank0]:     return func(*args, **kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/torch/utils/_contextlib.py", line 116, in decorate_context
+[rank0]:     return func(*args, **kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/worker/worker.py", line 229, in determine_num_available_blocks
+[rank0]:     self.model_runner.profile_run()
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/torch/utils/_contextlib.py", line 116, in decorate_context
+[rank0]:     return func(*args, **kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/worker/model_runner.py", line 1235, in profile_run
+[rank0]:     self._dummy_run(max_num_batched_tokens, max_num_seqs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/worker/model_runner.py", line 1346, in _dummy_run
+[rank0]:     self.execute_model(model_input, kv_caches, intermediate_tensors)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/torch/utils/_contextlib.py", line 116, in decorate_context
+[rank0]:     return func(*args, **kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/worker/model_runner.py", line 1719, in execute_model
+[rank0]:     hidden_or_intermediate_states = model_executable(
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+[rank0]:     return self._call_impl(*args, **kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+[rank0]:     return forward_call(*args, **kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/model_executor/models/qwen2.py", line 486, in forward
+[rank0]:     hidden_states = self.model(input_ids, positions, kv_caches,
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/compilation/decorators.py", line 172, in __call__
+[rank0]:     return self.forward(*args, **kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/model_executor/models/qwen2.py", line 348, in forward
+[rank0]:     hidden_states, residual = layer(
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+[rank0]:     return self._call_impl(*args, **kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+[rank0]:     return forward_call(*args, **kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/model_executor/models/qwen2.py", line 247, in forward
+[rank0]:     hidden_states = self.self_attn(
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+[rank0]:     return self._call_impl(*args, **kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+[rank0]:     return forward_call(*args, **kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/model_executor/models/qwen2.py", line 176, in forward
+[rank0]:     qkv, _ = self.qkv_proj(hidden_states)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+[rank0]:     return self._call_impl(*args, **kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+[rank0]:     return forward_call(*args, **kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/model_executor/layers/linear.py", line 382, in forward
+[rank0]:     output_parallel = self.quant_method.apply(self, input_, bias)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/model_executor/layers/linear.py", line 142, in apply
+[rank0]:     return F.linear(x, layer.weight, bias)
+[rank0]: RuntimeError: CUDA error: no kernel image is available for execution on the device
+[rank0]: CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+[rank0]: For debugging consider passing CUDA_LAUNCH_BLOCKING=1
+[rank0]: Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+
+[init] Resuming GPU idle worker...
+[idle_worker] GPU idle worker stopped.
+[main] Application shutdown complete.
+[rank0]:[W303 23:03:19.228261566 ProcessGroupNCCL.cpp:1496] Warning: WARNING: destroy_process_group() was not called before program exit, which can leak resources. For more info, please see https://pytorch.org/docs/stable/distributed.html#shutdown (function operator())
+INFO 03-03 23:03:20 model_runner.py:1110] Starting to load model /mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/Qwen2.5-Math-1.5B...
+Loading safetensors checkpoint shards:   0% Completed | 0/1 [00:00<?, ?it/s]
+Loading safetensors checkpoint shards: 100% Completed | 1/1 [00:00<00:00,  1.87it/s]
+Loading safetensors checkpoint shards: 100% Completed | 1/1 [00:00<00:00,  1.87it/s]
+
+INFO 03-03 23:03:21 model_runner.py:1115] Loading model weights took 2.8797 GB
+[rank0]: Traceback (most recent call last):
+[rank0]:   File "/usr/local/conda/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+[rank0]:     return _run_code(code, main_globals, None,
+[rank0]:   File "/usr/local/conda/lib/python3.10/runpy.py", line 86, in _run_code
+[rank0]:     exec(code, run_globals)
+[rank0]:   File "/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/TTCS/src/start_vllm_server.py", line 288, in <module>
+[rank0]:     initialize_model()
+[rank0]:   File "/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/TTCS/src/start_vllm_server.py", line 67, in initialize_model
+[rank0]:     model = vllm.LLM(
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/utils.py", line 1051, in inner
+[rank0]:     return fn(*args, **kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/entrypoints/llm.py", line 242, in __init__
+[rank0]:     self.llm_engine = self.engine_class.from_engine_args(
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/engine/llm_engine.py", line 484, in from_engine_args
+[rank0]:     engine = cls(
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/engine/llm_engine.py", line 276, in __init__
+[rank0]:     self._initialize_kv_caches()
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/engine/llm_engine.py", line 416, in _initialize_kv_caches
+[rank0]:     self.model_executor.determine_num_available_blocks())
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/executor/executor_base.py", line 101, in determine_num_available_blocks
+[rank0]:     results = self.collective_rpc("determine_num_available_blocks")
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/executor/uniproc_executor.py", line 51, in collective_rpc
+[rank0]:     answer = run_method(self.driver_worker, method, args, kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/utils.py", line 2220, in run_method
+[rank0]:     return func(*args, **kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/torch/utils/_contextlib.py", line 116, in decorate_context
+[rank0]:     return func(*args, **kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/worker/worker.py", line 229, in determine_num_available_blocks
+[rank0]:     self.model_runner.profile_run()
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/torch/utils/_contextlib.py", line 116, in decorate_context
+[rank0]:     return func(*args, **kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/worker/model_runner.py", line 1235, in profile_run
+[rank0]:     self._dummy_run(max_num_batched_tokens, max_num_seqs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/worker/model_runner.py", line 1346, in _dummy_run
+[rank0]:     self.execute_model(model_input, kv_caches, intermediate_tensors)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/torch/utils/_contextlib.py", line 116, in decorate_context
+[rank0]:     return func(*args, **kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/worker/model_runner.py", line 1719, in execute_model
+[rank0]:     hidden_or_intermediate_states = model_executable(
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+[rank0]:     return self._call_impl(*args, **kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+[rank0]:     return forward_call(*args, **kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/model_executor/models/qwen2.py", line 486, in forward
+[rank0]:     hidden_states = self.model(input_ids, positions, kv_caches,
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/compilation/decorators.py", line 172, in __call__
+[rank0]:     return self.forward(*args, **kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/model_executor/models/qwen2.py", line 348, in forward
+[rank0]:     hidden_states, residual = layer(
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+[rank0]:     return self._call_impl(*args, **kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+[rank0]:     return forward_call(*args, **kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/model_executor/models/qwen2.py", line 247, in forward
+[rank0]:     hidden_states = self.self_attn(
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+[rank0]:     return self._call_impl(*args, **kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+[rank0]:     return forward_call(*args, **kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/model_executor/models/qwen2.py", line 176, in forward
+[rank0]:     qkv, _ = self.qkv_proj(hidden_states)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+[rank0]:     return self._call_impl(*args, **kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+[rank0]:     return forward_call(*args, **kwargs)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/model_executor/layers/linear.py", line 382, in forward
+[rank0]:     output_parallel = self.quant_method.apply(self, input_, bias)
+[rank0]:   File "/usr/local/conda/lib/python3.10/site-packages/vllm/model_executor/layers/linear.py", line 142, in apply
+[rank0]:     return F.linear(x, layer.weight, bias)
+[rank0]: RuntimeError: CUDA error: no kernel image is available for execution on the device
+[rank0]: CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+[rank0]: For debugging consider passing CUDA_LAUNCH_BLOCKING=1
+[rank0]: Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+
+[init] Resuming GPU idle worker...
+[idle_worker] GPU idle worker stopped.
+[main] Application shutdown complete.
+[rank0]:[W303 23:03:22.398538105 ProcessGroupNCCL.cpp:1496] Warning: WARNING: destroy_process_group() was not called before program exit, which can leak resources. For more info, please see https://pytorch.org/docs/stable/distributed.html#shutdown (function operator())
+[idle_worker] GPU idle worker started.
