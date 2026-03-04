@@ -11,19 +11,35 @@ Ray init success {'CPU': 56.0, 'accelerator_type:A800': 1.0, 'node:__internal_he
 export RAY_raylet_start_wait_time_s=60
 
 
-12345
-12345
-ray init kwargs: {'include_dashboard': False, 'num_cpus': None, 'runtime_env': {'env_vars': {'TOKENIZERS_PARALLELISM': 'true', 'NCCL_DEBUG': 'WARN', 'VLLM_LOGGING_LEVEL': 'WARN', 'VLLM_ALLOW_RUNTIME_LORA_UPDATING': 'true', 'CUDA_DEVICE_MAX_CONNECTIONS': '1', 'NCCL_CUMEM_ENABLE': '0'}, 'working_dir': None}}
-Error executing job with overrides: ['algorithm.adv_estimator=grpo', 'data.train_batch_size=32', 'data.max_prompt_length=3072', 'data.max_response_length=1024', 'data.num_querys=160', '+data.get_prompts_func=ttrl_icl', '+data.gen_question_func=ttrl_icl', '+data.prompt_path=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/TTCS/src', 'data.filter_overlong_prompts=True', 'data.dynamic_topics=False', 'data.truncation=error', '+data.ttrl_icl_files=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/TTCS/data/ttrl/Minerva.parquet', 'actor_rollout_ref.model.path=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/Qwen2.5-Math-1.5B', 'actor_rollout_ref.actor.optim.lr=1e-6', "actor_rollout_ref.actor.checkpoint.save_contents=['hf_model']", 'actor_rollout_ref.model.use_remove_padding=True', 'actor_rollout_ref.actor.ppo_mini_batch_size=8', 'actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=2', 'actor_rollout_ref.actor.use_kl_loss=True', 'actor_rollout_ref.actor.kl_loss_coef=0.01', 'actor_rollout_ref.actor.kl_loss_type=low_var_kl', 'actor_rollout_ref.actor.entropy_coeff=0', 'actor_rollout_ref.model.enable_gradient_checkpointing=True', 'actor_rollout_ref.actor.fsdp_config.param_offload=False', 'actor_rollout_ref.actor.fsdp_config.optimizer_offload=False', 'actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=2', 'actor_rollout_ref.rollout.tensor_model_parallel_size=1', 'actor_rollout_ref.rollout.name=vllm', 'actor_rollout_ref.rollout.temperature=1.0', 'actor_rollout_ref.rollout.top_p=0.99', 'actor_rollout_ref.rollout.top_k=-1', 'actor_rollout_ref.rollout.gpu_memory_utilization=0.60', 'actor_rollout_ref.rollout.n=4', 'actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=2', 'actor_rollout_ref.ref.fsdp_config.param_offload=True', 'algorithm.use_kl_in_reward=False', 'reward_model.reward_manager=challenger', 'reward_model.reward_kwargs.storage_path=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/saved_results/Synthesizer_ttrl/data_Minerva_TTCS_gqttrl_icl_Qwen2.5-Math-1.5B-V2', '+reward_model.reward_kwargs.question_reward=TTCS', '+reward_model.reward_kwargs.group_question_repetion_penalty=True', '+reward_model.reward_kwargs.gen_question_func=ttrl_icl', 'trainer.critic_warmup=0', 'trainer.logger=["console","tensorboard"]', 'trainer.project_name=TTCS', 'trainer.experiment_name=Challenger-data_Minerva_TTCS_gqttrl_icl_Qwen2.5-Math-1.5B-V2', 'trainer.n_gpus_per_node=4', 'trainer.total_training_steps=5', 'trainer.nnodes=1', 'trainer.val_before_train=False', 'trainer.default_local_dir=/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/saved_results/Synthesizer_ttrl/data_Minerva_TTCS_gqttrl_icl_Qwen2.5-Math-1.5B-V2/ckpts/', 'trainer.save_freq=5', 'trainer.test_freq=-1', 'trainer.total_epochs=15']
-Traceback (most recent call last):
-  File "/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/TTCS/src/main_challenger.py", line 44, in main
-    run_ppo(config)
-  File "/mnt/dolphinfs/ssd_pool/docker/user/hadoop-ai-search/zhangyuchao05/TTCS-base/TTCS/src/main_challenger.py", line 70, in run_ppo
-    ray.init(include_dashboard=False, ignore_reinit_error=Flase)
-NameError: name 'Flase' is not defined
+(base) [hadoop-ai-search@psx3z03xriad1qir-worker-0 zhangyuchao05]$ rm -rf /tmp/ray
+(base) [hadoop-ai-search@psx3z03xriad1qir-worker-0 zhangyuchao05]$ export RAY_raylet_start_wait_time_s=300
+(base) [hadoop-ai-search@psx3z03xriad1qir-worker-0 zhangyuchao05]$ export RAY_gcs_rpc_server_reconnect_timeout_s=120
+(base) [hadoop-ai-search@psx3z03xriad1qir-worker-0 zhangyuchao05]$ ray start --head --include-dashboard=false --num-cpus=4
 
-Set the environment variable HYDRA_FULL_ERROR=1 for a complete stack trace.
-+ echo 'Error: Round 1 Challenger training failed'
-Error: Round 1 Challenger training failed
-(base) [hadoop-ai-search@psx3z03xriad1qir-worker-0 zhangyuchao05]$ + exit 1
-[idle_worker] GPU idle worker started.
+Enable usage stats collection? This prompt will auto-proceed in 10 seconds to avoid blocking cluster startup. Confirm [Y/n]:                                                                                                               Invalid answer: ray status. Expected y/yes/true/1 or n/no/false/0
+                                                                                                              Confirm [Y/n]: Usage stats collection is enabled. To disable this, add `--disable-usage-stats` to the command that starts the cluster, or run the following command: `ray disable-usage-stats` before starting the cluster. See https://docs.ray.io/en/master/cluster/usage-stats.html for more details.
+
+Local node IP: 10.166.176.28
+2026-03-04 14:10:51,595 ERROR services.py:1357 -- Failed to start the dashboard 
+2026-03-04 14:10:51,595 ERROR services.py:1382 -- Error should be written to 'dashboard.log' or 'dashboard.err'. We are printing the last 20 lines for you. See 'https://docs.ray.io/en/master/ray-observability/user-guides/configure-logging.html#logging-directory-structure' to find where the log file is.
+2026-03-04 14:10:51,595 ERROR services.py:1392 -- Couldn't read dashboard.log file. Error: [Errno 2] No such file or directory: '/tmp/ray/session_2026-03-04_14-10-26_302680_258613/logs/dashboard.log'. It means the dashboard is broken even before it initializes the logger (mostly dependency issues). Reading the dashboard.err file which contains stdout/stderr.
+2026-03-04 14:10:51,595 ERROR services.py:1426 -- Failed to read dashboard.err file: [Errno 2] No such file or directory: '/tmp/ray/session_2026-03-04_14-10-26_302680_258613/logs/dashboard.err'. It is unexpected. Please report an issue to Ray github. https://github.com/ray-project/ray/issues
+
+--------------------
+Ray runtime started.
+--------------------
+
+Next steps
+  To add another node to this Ray cluster, run
+    ray start --address='10.166.176.28:6379'
+  
+  To connect to this Ray cluster:
+    import ray
+    ray.init()
+  
+  To terminate the Ray runtime, run
+    ray stop
+  
+  To view the status of the cluster, use
+    ray status
+(base) [hadoop-ai-search@psx3z03xriad1qir-worker-0 zhangyuchao05]$ 
