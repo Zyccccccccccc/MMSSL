@@ -1,391 +1,116 @@
-(base) [hadoop-ai-search@psx3gw6xria5rpsd-worker-0 docker]$ RAY_gcs_rpc_server_reconnect_timeout_s=60 python -c 'import ray; ray.init(include_dashboard=False); print("Ray init success", ray.cluster_resources()); ray.shutdown()'
-
-2026-03-03 19:37:18,953 INFO worker.py:1951 -- Started a local Ray instance.
-Ray init success {'node:__internal_head__': 1.0, 'node:10.148.63.41': 1.0, 'memory': 900424326758.0, 'CPU': 56.0, 'GPU': 8.0, 'accelerator_type:A800': 1.0, 'object_store_memory': 102005465497.0}
-(base) [hadoop-ai-search@psx3gw6xria5rpsd-worker-0 docker]$ 
-(base) [hadoop-ai-search@psx3gw6xria5rpsd-worker-0 docker]$ RAY_gcs_rpc_server_reconnect_timeout_s=60 python -c 'import ray; ray.init(include_dashboard=False); print("Ray init success", ray.cluster_resources()); ray.shutdown()'
-2026-03-03 19:47:23,421 INFO worker.py:1951 -- Started a local Ray instance.
-Ray init success {'CPU': 56.0, 'accelerator_type:A800': 1.0, 'node:__internal_head__': 1.0, 'object_store_memory': 102005465497.0, 'node:10.148.63.41': 1.0, 'memory': 900423188070.0, 'GPU': 8.0}
-(base) [hadoop-ai-search@psx3gw6xria5rpsd-worker-0 docker]$ 
-
-export RAY_raylet_start_wait_time_s=60
-
-
-(# Copyright 2024 Bytedance Ltd. and/or its affiliates
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-"""
-Note that we don't combine the main with ray_trainer as ray_trainer is used by other mpain.
-"""
-
-import os
-import socket
-
-import hydra
-import ray
-from omegaconf import OmegaConf
-from src.Challenger_dataset import ChallengerTopicDataset
-from verl.experimental.dataset.sampler import AbstractSampler
-from verl.trainer.constants_ppo import get_ppo_ray_runtime_env
-#from verl.trainer.ppo.ray_trainer import RayPPOTrainer
-from src.Challenger_ray_trainer import ChallengerRayTrainer
-#from verl.trainer.ppo.reward import load_reward_manager
-from src.reward import load_reward_manager
-from verl.trainer.ppo.utils import need_critic, need_reference_policy
-from verl.utils.config import validate_config
-from verl.utils.device import is_cuda_available
-from verl.utils.import_utils import load_extern_type
-
-
-@hydra.main(config_path="config", config_name="challenger_trainer", version_base=None)
-def main(config):
-    """Main entry point for PPO training with Hydra configuration management.
-
-    Args:
-        config_dict: Hydra configuration dictionary containing training parameters.
-    """
-    run_ppo(config)
-
-
-# Define a function to run the PPO-like training process
-def run_ppo(config) -> None:
-    """Initialize Ray cluster and run distributed PPO training process.
-
-    Args:
-        config: Training configuration object containing all necessary parameters
-                for distributed PPO training including Ray initialization settings,
-                model paths, and training hyperparameters.
-    """
-    print("12345")
-    # Check if Ray is not initialized
-    if not ray.is_initialized():
-        print("12345")
-        # Initialize Ray with a local cluster configuration
-        # Set environment variables in the runtime environment to control tokenizer parallelism,
-        # NCCL debug level, VLLM logging level, and allow runtime LoRA updating
-        # `num_cpus` specifies the number of CPU cores Ray can use, obtained from the configuration
-        default_runtime_env = get_ppo_ray_runtime_env()
-        ray_init_kwargs = config.ray_kwargs.get("ray_init", {})
-        runtime_env_kwargs = ray_init_kwargs.get("runtime_env", {})
-        runtime_env = OmegaConf.merge(default_runtime_env, runtime_env_kwargs)
-        ray_init_kwargs = OmegaConf.create({**ray_init_kwargs, "runtime_env": runtime_env})
-        print(f"ray init kwargs: {ray_init_kwargs}")
-        ray.init(include_dashboard=False,)
-
-    # Create a remote instance of the TaskRunner class, and
-    # Execute the `run` method of the TaskRunner instance remotely and wait for it to complete
-    if (
-        is_cuda_available
-        and config.global_profiler.tool == "nsys"
-        and config.global_profiler.get("steps") is not None
-        and len(config.global_profiler.get("steps", [])) > 0
-    ):
-        from verl.utils.import_utils import is_nvtx_available
-
-        assert is_nvtx_available(), "nvtx is not available in CUDA platform. Please 'pip3 install nvtx'"
-        nsight_options = OmegaConf.to_container(
-            config.global_profiler.global_tool_config.nsys.controller_nsight_options
-        )
-        runner = TaskRunner.options(runtime_env={"nsight": nsight_options}).remote()
-    else:
-        runner = TaskRunner.remote()
-    ray.get(runner.run.remote(config))
-
-    # [Optional] get the path of the timeline trace file from the configuration, default to None
-    # This file is used for performance analysis
-    timeline_json_file = config.ray_kwargs.get("timeline_json_file", None)
-    if timeline_json_file:
-        ray.timeline(filename=timeline_json_file)
+<div align=center>
+<h1> 🧪 MixKV: Mixing Importance with Diversity for KV Cache Compression in Large Vision-Language Models </h1>
+</div>
 
-
-@ray.remote(num_cpus=1)  # please make sure main_task is not scheduled on head
-class TaskRunner:
-    """Ray remote class for executing distributed PPO training tasks.
-
-    This class encapsulates the main training logic and runs as a Ray remote actor
-    to enable distributed execution across multiple nodes and GPUs.
-
-    Attributes:
-        role_worker_mapping: Dictionary mapping Role enums to Ray remote worker classes
-        mapping: Dictionary mapping Role enums to resource pool IDs for GPU allocation
-    """
-
-    def __init__(self):
-        self.role_worker_mapping = {}
-        self.mapping = {}
-
-    def add_actor_rollout_worker(self, config):
-        """Add actor rollout worker based on the actor strategy."""
-        from verl.single_controller.ray import RayWorkerGroup
-
-        if config.actor_rollout_ref.actor.strategy in {"fsdp", "fsdp2"}:
-            from verl.workers.fsdp_workers import ActorRolloutRefWorker, AsyncActorRolloutRefWorker
-
-            actor_rollout_cls = (
-                AsyncActorRolloutRefWorker
-                if config.actor_rollout_ref.rollout.mode == "async"
-                else ActorRolloutRefWorker
-            )
-            ray_worker_group_cls = RayWorkerGroup
-
-        elif config.actor_rollout_ref.actor.strategy == "megatron":
-            from verl.workers.megatron_workers import ActorRolloutRefWorker, AsyncActorRolloutRefWorker
-
-            actor_rollout_cls = (
-                AsyncActorRolloutRefWorker
-                if config.actor_rollout_ref.rollout.mode == "async"
-                else ActorRolloutRefWorker
-            )
-            ray_worker_group_cls = RayWorkerGroup
-
-        else:
-            raise NotImplementedError
-
-        from verl.trainer.ppo.ray_trainer import Role
-
-        self.role_worker_mapping[Role.ActorRollout] = ray.remote(actor_rollout_cls)
-
-        return actor_rollout_cls, ray_worker_group_cls
-
-    def add_critic_worker(self, config):
-        """Add critic worker to role mapping."""
-        if config.critic.strategy in {"fsdp", "fsdp2"}:
-            use_legacy_worker_impl = config.trainer.get("use_legacy_worker_impl", "auto")
-            if use_legacy_worker_impl in ["auto", "enable"]:
-                from verl.workers.fsdp_workers import CriticWorker
-            elif use_legacy_worker_impl == "disable":
-                from verl.workers.roles import CriticWorker
-
-                print("Using new worker implementation")
-            else:
-                raise ValueError(f"Invalid use_legacy_worker_impl: {use_legacy_worker_impl}")
-
-        elif config.critic.strategy == "megatron":
-            from verl.workers.megatron_workers import CriticWorker
-
-        else:
-            raise NotImplementedError
-
-        from verl.trainer.ppo.ray_trainer import Role
-
-        self.role_worker_mapping[Role.Critic] = ray.remote(CriticWorker)
-
-    def init_resource_pool_mgr(self, config):
-        """Initialize resource pool manager."""
-        from verl.trainer.ppo.ray_trainer import Role
-
-        global_pool_id = "global_pool"
-        resource_pool_spec = {
-            global_pool_id: [config.trainer.n_gpus_per_node] * config.trainer.nnodes,
-        }
-        # TODO Here you can use the new registration method to support dynamic registration of roles
-        if config.reward_model.enable_resource_pool:
-            if config.reward_model.n_gpus_per_node <= 0:
-                raise ValueError("config.reward_model.n_gpus_per_node must be greater than 0")
-            if config.reward_model.nnodes <= 0:
-                raise ValueError("config.reward_model.nnodes must be greater than 0")
-
-            reward_pool = [config.reward_model.n_gpus_per_node] * config.reward_model.nnodes
-            resource_pool_spec["reward_pool"] = reward_pool
-
-        self.mapping[Role.ActorRollout] = global_pool_id
-        self.mapping[Role.Critic] = global_pool_id
-        from verl.trainer.ppo.ray_trainer import ResourcePoolManager
-
-        resource_pool_manager = ResourcePoolManager(resource_pool_spec=resource_pool_spec, mapping=self.mapping)
-        return resource_pool_manager
-
-    def add_reward_model_worker(self, config):
-        """Add reward model worker if enabled."""
-        from verl.trainer.ppo.ray_trainer import Role
-
-        if config.reward_model.enable:
-            use_legacy_worker_impl = config.trainer.get("use_legacy_worker_impl", "auto")
-            if use_legacy_worker_impl in ["auto", "enable"]:
-                if config.reward_model.strategy in {"fsdp", "fsdp2"}:
-                    from verl.workers.fsdp_workers import RewardModelWorker
-                elif config.reward_model.strategy == "megatron":
-                    from verl.workers.megatron_workers import RewardModelWorker
-                else:
-                    raise NotImplementedError
-            elif use_legacy_worker_impl == "disable":
-                from verl.workers.roles import RewardModelWorker
-
-                print("Using new worker implementation")
-            else:
-                raise ValueError(f"Invalid use_legacy_worker_impl: {use_legacy_worker_impl}")
-
-            self.role_worker_mapping[Role.RewardModel] = ray.remote(RewardModelWorker)
-            if config.reward_model.enable_resource_pool:
-                self.mapping[Role.RewardModel] = "reward_pool"
-            else:
-                self.mapping[Role.RewardModel] = "global_pool"
-
-    def add_ref_policy_worker(self, config, ref_policy_cls):
-        """Add reference policy worker if KL loss or KL reward is used."""
-        from verl.trainer.ppo.ray_trainer import Role
-
-        if config.algorithm.use_kl_in_reward or config.actor_rollout_ref.actor.use_kl_loss:
-            self.role_worker_mapping[Role.RefPolicy] = ray.remote(ref_policy_cls)
-            self.mapping[Role.RefPolicy] = "global_pool"
-
-    def run(self, config):
-        """Execute the main PPO training workflow.
-
-        This method sets up the distributed training environment, initializes
-        workers, datasets, and reward functions, then starts the training process.
-
-        Args:
-            config: Training configuration object containing all parameters needed
-                   for setting up and running the PPO training process.
-        """
-        # Print the initial configuration. `resolve=True` will evaluate symbolic values.
-        from pprint import pprint
-
-        from omegaconf import OmegaConf
-
-        from verl.utils.fs import copy_to_local
-
-        print(f"TaskRunner hostname: {socket.gethostname()}, PID: {os.getpid()}")
-        pprint(OmegaConf.to_container(config, resolve=True))
-        OmegaConf.resolve(config)
-
-        actor_rollout_cls, ray_worker_group_cls = self.add_actor_rollout_worker(config)
-        self.add_critic_worker(config)
-
-        # We should adopt a multi-source reward function here:
-        # - for rule-based rm, we directly call a reward score
-        # - for model-based rm, we call a model
-        # - for code related prompt, we send to a sandbox if there are test cases
-        # finally, we combine all the rewards together
-        # The reward type depends on the tag of the data
-        self.add_reward_model_worker(config)
-
-        # Add a reference policy worker if KL loss or KL reward is used.
-        self.add_ref_policy_worker(config, actor_rollout_cls)
-
-        # validate config
-        validate_config(
-            config=config,
-            use_reference_policy=need_reference_policy(self.role_worker_mapping),
-            use_critic=need_critic(config),
-        )
-
-        # Download the checkpoint from HDFS to the local machine.
-        # `use_shm` determines whether to use shared memory, which could lead to faster model loading if turned on
-        local_path = copy_to_local(
-            config.actor_rollout_ref.model.path, use_shm=config.actor_rollout_ref.model.get("use_shm", False)
-        )
-
-        # Instantiate the tokenizer and processor.
-        from verl.utils import hf_processor, hf_tokenizer
-
-        trust_remote_code = config.data.get("trust_remote_code", False)
-        # 添加 fix_mistral_regex=True 来修复 tokenizer regex pattern 警告
-        # 虽然模型是 Qwen，但 checkpoint 中保存的 tokenizer 可能触发此警告
-        tokenizer = hf_tokenizer(
-            local_path, 
-            trust_remote_code=trust_remote_code,
-            fix_mistral_regex=True  # 修复 tokenizer regex pattern，避免 tokenization 错误
-        )
-        # Used for multimodal LLM, could be None
-        processor = hf_processor(local_path, trust_remote_code=trust_remote_code, use_fast=True)
-
-        # Load the reward manager for training and validation.
-        reward_fn = load_reward_manager(
-            config, tokenizer, num_examine=0, **config.reward_model.get("reward_kwargs", {})
-        )
-        val_reward_fn = load_reward_manager(
-            config, tokenizer, num_examine=1, **config.reward_model.get("reward_kwargs", {})
-        )
-
-        resource_pool_manager = self.init_resource_pool_mgr(config)
-
-        from verl.utils.dataset.rl_dataset import collate_fn
-
-        # Create training and validation datasets.
-        train_dataset = ChallengerTopicDataset(tokenizer=tokenizer, config=config.data)
-        val_dataset = ChallengerTopicDataset(tokenizer=tokenizer, config=config.data)
-        train_sampler = create_rl_sampler(config.data, train_dataset)
-
-        # Initialize the PPO trainer.
-        trainer = ChallengerRayTrainer(
-            config=config,
-            tokenizer=tokenizer,
-            processor=processor,
-            role_worker_mapping=self.role_worker_mapping,
-            resource_pool_manager=resource_pool_manager,
-            ray_worker_group_cls=ray_worker_group_cls,
-            reward_fn=reward_fn,
-            val_reward_fn=val_reward_fn,
-            train_dataset=train_dataset,
-            val_dataset=val_dataset,
-            collate_fn=collate_fn,
-            train_sampler=train_sampler,
-        )
-        # Initialize the workers of the trainer.
-        trainer.init_workers()
-
-        # Start the training process.
-        trainer.fit()
-
-
-
-def create_rl_sampler(data_config, dataset):
-    """Create a sampler for the dataset.
-
-    Arguments:
-        data_config: The data config.
-        dataset (Dataset): The dataset.
-
-    Returns:
-        sampler (Sampler): The sampler.
-    """
-    import torch
-    from torch.utils.data import RandomSampler, SequentialSampler
-
-    if data_config.sampler is not None and data_config.sampler.get("class_path", None) is not None:
-        curriculum_class = load_extern_type(
-            data_config.sampler.class_path,
-            data_config.sampler.class_name,
-        )
-        sampler = curriculum_class(
-            data_source=dataset,
-            data_config=data_config,
-        )
-        assert isinstance(sampler, AbstractSampler)
-        assert data_config.get("dataloader_num_workers", 8) == 0, (
-            "If using curriculum, num_workers must be 0 to prevent data caching. "
-            "If the dataloader caches data before the batch is done the "
-            "curriculum sampler won't have the opportunity to reorder it. "
-        )
-
-    # Use a sampler to facilitate checkpoint resumption.
-    # If shuffling is enabled in the data configuration, create a random sampler.
-    elif data_config.shuffle:
-        train_dataloader_generator = torch.Generator()
-        train_dataloader_generator.manual_seed(data_config.get("seed", 1))
-        sampler = RandomSampler(data_source=dataset, generator=train_dataloader_generator)
-    else:
-        # If shuffling is disabled, use a sequential sampler to iterate through the dataset in order.
-        sampler = SequentialSampler(data_source=dataset)
-
-    return sampler
-
-
-
-
-
-
-if __name__ == "__main__":
-    main()
+## 📌 Highlights
+
+- **🔌 Seamless Integration:** MixKV is a plug-and-play framework that directly enhances existing KV cache compression methods (SnapKV, PyramidKV, AdaKV, SparseMM) without modifying their core architecture—only the scoring function is replaced.
+- **📈 Consistent Performance Gains:** MixKV universally improves all baselines across 3 LVLMs and 5 benchmarks. Under extreme compression (budget=64), MixKV boosts baselines by an average of **5.1%**.
+- **⚙️ Parameter-Free Adaptation:** The head-wise mixing weight is derived directly from quantified semantic redundancy—no additional hyperparameters or tuning required. High-redundancy heads automatically emphasize diversity while low-redundancy heads prioritize importance.
+- **⚡ High Efficiency:** All additional operations (key normalization, mean computation, redundancy quantification, diversity scoring) scale linearly in $O(T \cdot D)$, adding **<1% latency overhead** with zero extra memory footprint.
+
+## 📊 Baselines
+
+We integrate MixKV with the following KV cache compression methods:
+
+| Method | Description | Repository |
+|--------|-------------|------------|
+| **SnapKV** | Attention-based importance with kernel pooling, uniform budget | [FasterDecoding/SnapKV](https://github.com/FasterDecoding/SnapKV) |
+| **PyramidKV** | Layer-wise pyramidal budget allocation | [Zefan-Cai/PyramidKV](https://github.com/Zefan-Cai/PyramidKV) |
+| **AdaKV** | Head-wise adaptive budget allocation | [FFY0/AdaKV](https://github.com/FFY0/AdaKV) |
+| **SparseMM** | Sparse multimodal KV cache compression | [CR400AF-A/SparseMM](https://github.com/CR400AF-A/SparseMM) |
+
+## 📂 Evaluation Benchmarks
+
+We evaluate on five multi-modal understanding benchmarks:
+
+| Benchmark | Task | Link |
+|-----------|------|------|
+| **DocVQA** | Document Visual QA | [docvqa.org](https://www.docvqa.org/) |
+| **OCRBench** | OCR Evaluation | [Yuliang-Liu/MultimodalOCR](https://github.com/Yuliang-Liu/MultimodalOCR) |
+| **TextVQA** | Text-based Visual QA | [textvqa.org](https://textvqa.org/) |
+| **ChartQA** | Chart Understanding QA | [vis-nlp/ChartQA](https://github.com/vis-nlp/ChartQA) |
+| **TextCaps** | Text-aware Image Captioning | [textvqa.org/textcaps](https://textvqa.org/textcaps/) |
+
+All evaluations are conducted using the [**lmms-eval**](https://github.com/EvolvingLMMs-Lab/lmms-eval) toolkit.
+
+## 🛠 Preparation
+
+1. Clone this repository:
+```bash 
+cd MixKV
+```
+
+2. Create and activate the environment:
+```bash
+conda create -n mixkv python=3.10 -y
+conda activate mixkv
+```
+
+3. Install packages:
+
+Compile CUDA code for Flatten Cache Storage. If you encounter a CUDA compile error, please check your [GPU Virtual Architecture](https://docs.nvidia.com/cuda/cuda-compiler-driver-nvcc/index.html#virtual-architecture-feature-list) and [GPU Feature](https://docs.nvidia.com/cuda/cuda-compiler-driver-nvcc/index.html#gpu-feature-list), then change the corresponding compile flag in [csrc/build.py](https://github.com/xuyang-liu16/MixKV/blob/main/csrc/build.py#L20).
+```bash
+pip install packaging torch==2.5.1
+pip uninstall ninja && pip cache purge && pip install ninja --no-cache-dir
+cd csrc && make
+cd ..
+```
+
+Install other packages:
+```bash
+pip install -e .
+pip install flash-attn==2.4.1 --no-build-isolation
+pip install qwen-vl-utils
+```
+
+4. Install [lmms-eval](https://github.com/EvolvingLMMs-Lab/lmms-eval) for evaluation:
+
+```bash
+cd lmms-eval
+pip install -e . 
+```
+
+## 🚀 Performance Evaluation
+
+<p align="center"> <img src="assets/performance.png" width="1000" align="center"> </p>
+
+To evaluate LLaVA-NeXT-Mistral-7B, InternVL3-8B, and Qwen2-VL-7B:
+
+```bash
+bash scripts/eval/mistral.sh
+bash scripts/eval/internvl2.sh
+bash scripts/eval/qwen.sh
+```
+
+Key environment variables:
+- `METHOD`: compression method (`snapkv`, `pyramidkv`, `adakv`, `mixsparsemm`)
+- `BUDGET`: KV budget per head (`64`, `128`, `256`)
+- `SELECT_METHOD`: scoring method (`attn` for baseline, `headwisemixkv` for MixKV)
+
+## ⚡ Efficiency Analysis
+
+<p align="center"> <img src="assets/efficiency.png" width="1000" align="center"> </p>
+
+To evaluate the latency and peak memory under different settings:
+
+```bash
+bash scripts/others/speed_and_memory.sh
+```
+
+## 📌 Citation
+
+Please consider citing our paper in your publications, if our findings help your research.
+
+```bibtex
+@article{liu2025mixkv,
+  title={Mixing Importance with Diversity: Joint Optimization for KV Cache Compression in Large Vision-Language Models},
+  author={Liu, Xuyang and Gui, Xiyan and Zhang, Yuchao and Zhang, Linfeng},
+  journal={arXiv preprint arXiv:2510.20707},
+  year={2025}
+}
+```
+
+## 👍 Acknowledgment
+
+Our codebase is built upon [SparseMM](https://github.com/CR400AF-A/SparseMM) and we extend our gratitude to the open-source efforts. We also thank the developers of [SnapKV](https://github.com/FasterDecoding/SnapKV), [PyramidKV](https://github.com/Zefan-Cai/PyramidKV), [AdaKV](https://github.com/FFY0/AdaKV), and [lmms-eval](https://github.com/EvolvingLMMs-Lab/lmms-eval).
